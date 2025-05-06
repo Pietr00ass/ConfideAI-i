@@ -1,0 +1,14 @@
+fastapi
+uvicorn[standard]
+Jinja2
+itsdangerous
+authlib
+python-multipart
+sqlmodel
+stripe
+pytesseract
+opencv-python-headless
+cryptography
+numpy
+spacy
+pl_core_news_sm @ https://github.com/explosion/spacy-models/releases/download/pl_core_news_sm-3.5.0/pl_core_news_sm-3.5.0.tar.gz
