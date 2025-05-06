@@ -112,6 +112,13 @@
     <p>© 2025 ConfideAI &mdash; Wszystkie prawa zastrzeżone.</p>
     <p>Kontakt: support@confideai.com</p>
   </footer>
-
+<script>
+  window.addEventListener('load', () => {
+    const overlay = document.getElementById('loader-overlay');
+    overlay.style.transition = 'opacity 0.5s ease';
+    overlay.style.opacity = '0';
+    setTimeout(() => overlay.remove(), 500);
+  });
+</script>
 </body>
 </html>
