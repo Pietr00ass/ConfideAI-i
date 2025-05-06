@@ -83,5 +83,27 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     });
   </script>
+    <!-- Three.js (wymagane przez Vanta) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <!-- Vanta.NET -->
+  <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.net.min.js"></script>
+  
+  <script>
+    // Poczekaj, aż strona się załaduje
+    document.addEventListener("DOMContentLoaded", () => {
+      VANTA.NET({
+        el: "#vanta-bg",
+        // Kolory
+        color: 0x222222,         // kolor linii
+        backgroundColor: 0x000000,// tło
+        // Parametry efektu
+        maxDistance: 20.00,
+        spacing: 15.00,
+        showDots: false
+      });
+    });
+  </script>
+</body>
+
 </body>
 </html>
