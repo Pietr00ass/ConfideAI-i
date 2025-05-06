@@ -339,3 +339,10 @@ a.btn:focus {
   transform: scale(1.02);
   box-shadow: 0 0 24px var(--glow);
 }
+.icon {
+  width: 1em;
+  height: 1em;
+  fill: currentColor;
+  vertical-align: middle;
+  margin-right: 0.5em;
+}
