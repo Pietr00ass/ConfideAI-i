@@ -24,6 +24,7 @@ body[data-theme="light"]{--grad-start:#4f46e5;--grad-end:#9333ea;--glow:rgba(147
 ::-webkit-scrollbar-track{background:rgba(0,0,0,0.2)}
 
 /* 4. Navigation */
+
 /* NAVBAR – półprzezroczyste, rozmyte tło */
 nav {
   position: sticky;
@@ -31,6 +32,7 @@ nav {
   z-index: 1000;
 
   display: flex;
+  justify-content: center;  /* centrowanie w poziomie */
   gap: 1rem;
   padding: 1rem 2rem;
 
