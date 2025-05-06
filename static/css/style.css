@@ -163,3 +163,20 @@ nav a.active::after {
                animation:rotate 1.2s linear infinite;margin-bottom:16px}
 #html-para{color:#ccc;font-size:.9rem;margin:0}
 @keyframes rotate{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+a.btn {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  border-radius: 999px;
+  background: linear-gradient(45deg, var(--grad-start), var(--grad-end));
+  color: #fff;
+  font-weight: 500;
+  text-decoration: none;
+  box-shadow: 0 0 8px var(--glow);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Hover / Focus */
+a.btn:hover,
+a.btn:focus {
+  transform: scale(1.05);
+  box-shadow: 0 0 16px var(--glow);
