@@ -9,24 +9,22 @@
 
       <form action="/encrypt" method="post" enctype="multipart/form-data" class="form-card" data-aos="fade-up" data-aos-delay="100">
         <!-- Stylowany wybór pliku -->
-        <div class="form-group file-group">
+        <div class="file-group">
           <input type="file" name="file" id="file-input" required>
-          <label for="file-input" class="btn btn-file">
+          <label for="file-input" class="btn-file">
             <i class="icon-upload"></i> Wybierz plik
           </label>
           <span class="file-name" id="file-name">Nie wybrano pliku</span>
         </div>
 
         <!-- Checkbox -->
-        <div class="form-group">
-          <label class="checkbox-label">
-            <input type="checkbox" name="delete_orig">
-            Usuń oryginał
-          </label>
-        </div>
+        <label class="checkbox-label">
+          <input type="checkbox" name="delete_orig">
+          Usuń oryginał
+        </label>
 
         <!-- Submit -->
-        <button type="submit" class="btn btn-primary">Zaszyfruj</button>
+        <button type="submit" class="btn-primary">Zaszyfruj</button>
       </form>
     </div>
   </section>
