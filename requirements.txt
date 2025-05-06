@@ -10,5 +10,5 @@ pytesseract
 opencv-python-headless
 cryptography
 numpy
-spacy==3.5.0
-pl_core_news_sm @ https://github.com/explosion/spacy-models/releases/download/pl_core_news_sm-3.5.0/pl_core_news_sm-3.5.0.tar.gz
+spacy==3.8.5
+pl_core_news_sm @ https://github.com/explosion/spacy-models/releases/download/pl_core_news_sm-3.8.0/pl_core_news_sm-3.8.0.tar.gz
