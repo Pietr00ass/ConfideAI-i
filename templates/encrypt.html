@@ -1,18 +1,35 @@
 {% extends "base.html" %}
-
 {% block title %}Szyfrowanie – ConfideAI{% endblock %}
 
 {% block content %}
-  <section class="section" data-aos="fade-up">
+  <section class="section reveal-on-scroll" data-aos="fade-up">
     <div class="container">
-      <h1>Szyfrowanie pliku</h1>
+      <h1 class="text-center">Szyfrowanie pliku</h1>
 
-      <form action="/encrypt" method="post" enctype="multipart/form-data" class="form-card" data-aos="fade-up" data-aos-delay="100">
-        <!-- Stylowany wybór pliku -->
+      <form action="/encrypt"
+            method="post"
+            enctype="multipart/form-data"
+            class="form-card reveal-on-scroll"
+            data-aos="fade-up"
+            data-aos-delay="100">
+
+        <!-- Lottie lock animacja -->
+        <div class="text-center" style="margin-bottom:1rem;">
+          <lottie-player
+            src="/static/animations/lock.json"
+            background="transparent"
+            speed="1"
+            style="width:80px; height:80px; margin:auto;"
+            loop
+            autoplay>
+          </lottie-player>
+        </div>
+
+        <!-- Wybór pliku -->
         <div class="file-group">
           <input type="file" name="file" id="file-input" required>
           <label for="file-input" class="btn-file">
-            <i class="icon-upload"></i> Wybierz plik
+            <i class="fas fa-file-upload"></i> Wybierz plik
           </label>
           <span class="file-name" id="file-name">Nie wybrano pliku</span>
         </div>
@@ -23,18 +40,28 @@
           Usuń oryginał
         </label>
 
+        <!-- Pasek postępu -->
+        <div id="upload-progress" class="progress-bar"></div>
+
         <!-- Submit -->
-        <button type="submit" class="btn-primary">Zaszyfruj</button>
+        <button type="submit" class="btn-primary">
+          <i class="fas fa-lock"></i> Zaszyfruj
+        </button>
       </form>
     </div>
   </section>
 
   <script>
-    // Podmiana nazwy pliku po wyborze
-    const input = document.getElementById('file-input');
-    const fileName = document.getElementById('file-name');
-    input.addEventListener('change', () => {
-      fileName.textContent = input.files[0]?.name || 'Nie wybrano pliku';
+    // Podmiana nazwy pliku
+    const inp = document.getElementById('file-input'),
+          fn  = document.getElementById('file-name'),
+          pr  = document.getElementById('upload-progress'),
+          frm = document.querySelector('form');
+    inp.addEventListener('change', () => {
+      fn.textContent = inp.files[0]?.name || 'Nie wybrano pliku';
+    });
+    frm.addEventListener('submit', () => {
+      pr.style.width = '100%';
     });
   </script>
 {% endblock %}
