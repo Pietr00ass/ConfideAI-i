@@ -1,3 +1,27 @@
 <!DOCTYPE html>
-<html lang="pl"><head><meta charset="UTF-8"><link rel="stylesheet" href="/static/css/style.css"><title>Dashboard</title></head>
-<body>{% include "nav.html" %}<section class="section"><h1>Witaj, {{ user.email }}</h1><ul><li><a href="/encrypt">Szyfrowanie pliku</a></li><li><a href="/ocr">OCR obrazu</a></li><li><a href="/anonymize">Anonimizacja obrazu</a></li></ul></section></body></html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard – ConfideAI</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  {% include "nav.html" %}
+  <section class="section dashboard">
+    <div class="profile-card">
+      <h3>Profil użytkownika</h3>
+      <p><strong>Email:</strong> {{ user.email }}</p>
+      <p><strong>Data utworzenia:</strong> {{ user.created_at.strftime("%Y-%m-%d") }}</p>
+      <p><strong>Subskrypcja:</strong> {{ user.subscription or "Brak" }}</p>
+    </div>
+    <div class="activity-card">
+      <h3>Aktywność</h3>
+      <ul>
+        <li><a href="/encrypt" class="btn">Szyfrowanie pliku</a></li>
+        <li><a href="/ocr" class="btn">Analiza OCR</a></li>
+        <li><a href="/anonymize" class="btn">Anonimizacja obrazu</a></li>
+      </ul>
+    </div>
+  </section>
+</body>
+</html>
