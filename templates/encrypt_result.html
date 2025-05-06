@@ -1,3 +1,20 @@
-<!DOCTYPE html>
-<html lang="pl"><head><meta charset="UTF-8"><link rel="stylesheet" href="/static/css/style.css"><title>Wynik szyfrowania</title></head>
-<body>{% include "nav.html" %}<section class="section"><h1>Plik zaszyfrowany</h1><p><a href="/{{ enc_path }}">Pobierz zaszyfrowany plik</a></p><p><a href="/{{ key_path }}">Pobierz klucz</a></p></section></body></html>
+{% extends "base.html" %}
+
+{% block title %}Wynik szyfrowania – ConfideAI{% endblock %}
+
+{% block content %}
+  <section class="section" data-aos="fade-up">
+    <h1>Plik zaszyfrowany</h1>
+
+    <p>
+      <a href="/{{ enc_path }}" class="btn" data-aos="fade-right">
+        Pobierz zaszyfrowany plik
+      </a>
+    </p>
+    <p>
+      <a href="/{{ key_path }}" class="btn" data-aos="fade-left">
+        Pobierz klucz
+      </a>
+    </p>
+  </section>
+{% endblock %}
