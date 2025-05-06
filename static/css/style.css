@@ -15,9 +15,48 @@ body[data-theme="light"]{--grad-start:#4f46e5;--grad-end:#9333ea;--glow:rgba(147
 ::-webkit-scrollbar-track{background:rgba(0,0,0,0.2)}
 
 /* 4. Navigation */
-nav{background:#111;padding:1rem 2rem;display:flex;gap:1rem;position:sticky;top:0;z-index:100}
-nav a{position:relative;display:inline-block;font-weight:500;transition:transform .2s,color .2s}
-nav a:hover{transform:scale(1.05);color:var(--grad-end)}
+/* NAVBAR – półprzezroczyste, rozmyte tło */
+nav {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+
+  display: flex;
+  gap: 1rem;
+  padding: 1rem 2rem;
+
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+/* Linki w nawigacji */
+nav a {
+  color: #ddd;
+  font-weight: 500;
+  transition: transform 0.2s, color 0.2s;
+}
+nav a:hover {
+  transform: scale(1.1);
+  color: var(--grad-end);
+}
+
+/* Wyróżnienie aktywnego linku */
+nav a.active {
+  color: #fff;
+  position: relative;
+}
+nav a.active::after {
+  content: "";
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(45deg, var(--grad-start), var(--grad-end));
+}
 
 /* 5. Hero + Parallax */
 #particles-js{position:absolute;inset:0;z-index:0}
