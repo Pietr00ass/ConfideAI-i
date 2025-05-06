@@ -4,6 +4,16 @@
 
 {% block content %}
   <section class="section" data-aos="fade-up">
+    <div class="text-center" style="margin-bottom:1rem;">
+  <lottie-player
+    src="/static/animations/search.json"
+    background="transparent"
+    speed="1"
+    style="width:80px; height:80px; margin:auto;"
+    loop autoplay>
+  </lottie-player>
+</div>
+
     <h1>OCR obrazu</h1>
 
     <form action="/ocr" method="post" enctype="multipart/form-data" data-aos="fade-up">
