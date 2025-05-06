@@ -1,13 +1,9 @@
-<!DOCTYPE html>
-<html lang="pl">
-<head>
-  <meta charset="UTF-8">
-  <title>Technologia – ConfideAI</title>
-  <link rel="stylesheet" href="/static/css/style.css">
-</head>
-<body>
-  {% include "nav.html" %}
-  <section class="section">
+{% extends "base.html" %}
+
+{% block title %}Technologia – ConfideAI{% endblock %}
+
+{% block content %}
+  <section class="section" data-aos="fade-up">
     <h2>Technologia</h2>
     <div class="tech-list">
       {% for tech in [
@@ -18,15 +14,14 @@
         {"icon":"/static/img/spacy.svg","title":"spaCy NER","desc":"Wykrywanie danych wrażliwych i anonimizacja."},
         {"icon":"/static/img/cryptography.svg","title":"Cryptography","desc":"AES-CFB, HMAC i RSA dla bezpieczeństwa."}
       ] %}
-      <div class="tech-item">
-        <img class="icon" src="{{ tech.icon }}" alt="{{ tech.title }}">
-        <div>
-          <h4>{{ tech.title }}</h4>
-          <p>{{ tech.desc }}</p>
+        <div class="tech-item" data-aos="zoom-in">
+          <img class="icon" src="{{ tech.icon }}" alt="{{ tech.title }}">
+          <div>
+            <h4>{{ tech.title }}</h4>
+            <p>{{ tech.desc }}</p>
+          </div>
         </div>
-      </div>
       {% endfor %}
     </div>
   </section>
-</body>
-</html>
+{% endblock %}
