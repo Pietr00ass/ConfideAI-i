@@ -3,27 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <title>{% block title %}ConfideAI{% endblock %}</title>
-<script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+
+  <!-- Lottie Player -->
+  <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
 
   <!-- Podstawowy CSS -->
   <link rel="stylesheet" href="/static/css/style.css">
-
-  <!-- FontAwesome -->
-  <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    integrity="sha512-pEMXVoV9o+3uolcfpoF7XkFVdPxwZl0VqXQ3N+uPO5WVMh8h5cDJ0ftxFSCF7P1kC9q88F3BG5p3sP4nO96Uiw=="
-    crossorigin="anonymous"
-    referrerpolicy="no-referrer"
-  />
 
   <!-- AOS -->
   <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet" />
 </head>
 <body>
+  <!-- SVG Sprite -->
   {% include "img/icons.svg" %}
-  <!-- Vanta.js tło -->
-  <div id="vanta-bg"></div>
 
   <!-- Loader -->
   <div id="loader-overlay">
@@ -36,16 +28,10 @@
   <!-- Nawigacja -->
   {% include "nav.html" %}
 
-  <!-- Particles.js -->
-  <div id="particles-js"></div>
-
   <!-- Główna zawartość -->
   <main>
     {% block content %}{% endblock %}
   </main>
-
-  <!-- Back to Top -->
-  <button id="back-to-top" title="Back to top"><i class="fas fa-chevron-up"></i></button>
 
   <!-- Footer -->
   <footer>
@@ -58,54 +44,49 @@
   <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.net.min.js"></script>
-  <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
 
   <script>
-    // 1. Ukryj loader
+    // 1. Ukryj loader po załadowaniu
     window.addEventListener('load', () => {
       document.getElementById('loader-overlay').style.display = 'none';
     });
 
-    // 2. AOS init
+    // 2. Inicjalizacja AOS
     AOS.init({ duration: 800, once: true });
 
-    // 3. Parallax init
+    // 3. Inicjalizacja parallax (Rellax)
     new Rellax('.rellax', { speed: -2 });
 
     // 4. Particles.js
     particlesJS.load('particles-js', '/static/particles.json');
 
-    // 5. Back to Top
+    // 5. Back to Top (opcjonalnie, jeśli masz przycisk)
     const backBtn = document.getElementById('back-to-top');
-    window.addEventListener('scroll', () => {
-      backBtn.style.display = window.scrollY > 300 ? 'block' : 'none';
-    });
-    backBtn.addEventListener('click', () => {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
+    if (backBtn) {
+      window.addEventListener('scroll', () => {
+        backBtn.style.display = window.scrollY > 300 ? 'block' : 'none';
+      });
+      backBtn.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    }
 
-    // 6. Vanta.NET
+    // 6. Vanta per sekcja
     document.addEventListener("DOMContentLoaded", () => {
-      VANTA.NET({
-        el: "#vanta-bg",
-        color: 0x222222,
-        backgroundColor: 0x000000,
-        maxDistance: 20.00,
-        spacing: 15.00,
-        showDots: false
+      document.querySelectorAll('[data-vanta]').forEach(sec => {
+        const type = sec.dataset.vanta.toLowerCase();
+        const opts = { el: sec, backgroundColor: 0x000000 };
+        if (type === 'net') {
+          Object.assign(opts, { color: 0x222222, maxDistance:20, spacing:15, showDots:false });
+          VANTA.NET(opts);
+        } else if (type === 'birds') {
+          VANTA.BIRDS(Object.assign(opts, { backgroundAlpha: 0.0 }));
+        } else if (type === 'dots') {
+          VANTA.DOTS(Object.assign(opts, { color:0x444444, size:2.0, spacing:30.0 }));
+        }
+        // Możesz dodać kolejne efekty: WAVES, LINES, GLOBE...
       });
     });
-
-    // 7. IntersectionObserver dla reveal
-    const io = new IntersectionObserver((entries) => {
-      entries.forEach(e => {
-        if (e.isIntersecting) {
-          e.target.classList.add('reveal');
-          io.unobserve(e.target);
-        }
-      });
-    }, { threshold: 0.2 });
-    document.querySelectorAll('.reveal-on-scroll').forEach(el => io.observe(el));
   </script>
 </body>
 </html>
