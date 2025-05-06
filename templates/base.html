@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <title>{% block title %}ConfideAI{% endblock %}</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+  <!-- AOS -->
+  <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet" />
+  <!-- Feather Icons for theme toggle -->
+  <script defer src="https://unpkg.com/feather-icons"></script>
+</head>
+<body data-theme="dark">
+
+  <!-- Dark mode toggle -->
+  <button id="theme-toggle" aria-label="Toggle theme">
+    <i data-feather="moon"></i>
+  </button>
+
+  <!-- Loader -->
+  <div id="loader-overlay">
+    <div id="container">
+      <div id="html-spinner"></div>
+      <p id="html-para">Ładowanie aplikacji…</p>
+    </div>
+  </div>
+
+  <!-- Navigation -->
+  {% include "nav.html" %}
+
+  <!-- Particles background -->
+  <div id="particles-js"></div>
+
+  <!-- Główna zawartość -->
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Back to Top -->
+  <button id="back-to-top" title="Back to top">↑</button>
+
+  <footer>
+    <p>© 2025 ConfideAI — Wszystkie prawa zastrzeżone.</p>
+  </footer>
+
+  <!-- Skrypty -->
+  <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/rellax@1.12.1/rellax.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    // 1. Ukryj loader
+    window.addEventListener('load', () => {
+      document.getElementById('loader-overlay').style.display = 'none';
+    });
+
+    // 2. AOS init
+    AOS.init({ duration: 800, once: true });
+
+    // 3. Parallax init
+    new Rellax('.rellax', { speed: -2 });
+
+    // 4. Particles init (wgraj też static/particles.json)
+    particlesJS.load('particles-js', '/static/particles.json');
+
+    // 5. Dark/light toggle
+    const themeToggle = document.getElementById('theme-toggle'),
+          html = document.documentElement;
+    themeToggle.addEventListener('click', () => {
+      const next = html.dataset.theme === 'dark' ? 'light' : 'dark';
+      html.dataset.theme = next;
+      localStorage.theme = next;
+      feather.replace();
+    });
+    if(localStorage.theme) html.dataset.theme = localStorage.theme;
+    document.addEventListener('DOMContentLoaded', () => feather.replace());
+
+    // 6. Back to Top
+    const btn = document.getElementById('back-to-top');
+    window.addEventListener('scroll', () => {
+      btn.style.display = window.scrollY > 400 ? 'block' : 'none';
+    });
+    btn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  </script>
+</body>
+</html>
