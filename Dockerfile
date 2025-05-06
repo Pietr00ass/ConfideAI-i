@@ -19,10 +19,10 @@ WORKDIR /app
 # 4. Skopiuj requirements i zainstaluj je
 COPY requirements.txt .
 RUN pip install --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt
+    pip install --no-cache-dir --only-binary=:all: -r requirements.txt
 
 # 5. (Opcjonalnie) Jeśli chcesz, możesz pobrać model spaCy tak:
-#    RUN python -m spacy download pl_core_news_sm
+RUN python -m spacy download pl_core_news_sm
 
 # 6. Skopiuj resztę kodu aplikacji
 COPY . .
