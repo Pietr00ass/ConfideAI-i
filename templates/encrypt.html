@@ -4,22 +4,39 @@
 
 {% block content %}
   <section class="section" data-aos="fade-up">
-    <h1>Szyfrowanie pliku</h1>
+    <div class="container">
+      <h1>Szyfrowanie pliku</h1>
 
-    <form action="/encrypt" method="post" enctype="multipart/form-data" data-aos="fade-up">
-      <div class="form-group">
-        <input type="file" name="file" id="file-input" required>
-        <label for="file-input">Wybierz plik</label>
-      </div>
+      <form action="/encrypt" method="post" enctype="multipart/form-data" class="form-card" data-aos="fade-up" data-aos-delay="100">
+        <!-- Stylowany wybór pliku -->
+        <div class="form-group file-group">
+          <input type="file" name="file" id="file-input" required>
+          <label for="file-input" class="btn btn-file">
+            <i class="icon-upload"></i> Wybierz plik
+          </label>
+          <span class="file-name" id="file-name">Nie wybrano pliku</span>
+        </div>
 
-      <div class="form-group">
-        <label>
-          <input type="checkbox" name="delete_orig">
-          Usuń oryginał
-        </label>
-      </div>
+        <!-- Checkbox -->
+        <div class="form-group">
+          <label class="checkbox-label">
+            <input type="checkbox" name="delete_orig">
+            Usuń oryginał
+          </label>
+        </div>
 
-      <button type="submit" class="btn">Zaszyfruj</button>
-    </form>
+        <!-- Submit -->
+        <button type="submit" class="btn btn-primary">Zaszyfruj</button>
+      </form>
+    </div>
   </section>
+
+  <script>
+    // Podmiana nazwy pliku po wyborze
+    const input = document.getElementById('file-input');
+    const fileName = document.getElementById('file-name');
+    input.addEventListener('change', () => {
+      fileName.textContent = input.files[0]?.name || 'Nie wybrano pliku';
+    });
+  </script>
 {% endblock %}
