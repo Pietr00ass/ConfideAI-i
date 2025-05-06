@@ -5,6 +5,7 @@ from fastapi.staticfiles import StaticFiles
 from starlette.templating import Jinja2Templates
 from starlette.middleware.sessions import SessionMiddleware
 
+
 from auth import get_authorization_url, fetch_user_info
 from db import init_db, engine
 from models import User
@@ -67,13 +68,19 @@ async def enc_post(request, file:UploadFile=File(...), delete_orig:bool=Form(Fal
     return templates.TemplateResponse("encrypt_result.html",{"request":request,"enc_path":enc,"key_path":key})
 
 @app.get("/ocr", response_class=HTMLResponse)
-def ocr_form(request): return templates.TemplateResponse("ocr.html",{"request":request})
+def ocr_form(request: Request):
+    # zwracamy szablon i podajemy obiekt request
+    return templates.TemplateResponse("ocr.html", {"request": request})
 @app.post("/ocr", response_class=HTMLResponse)
-async def ocr_post(request, file:UploadFile=File(...)):
-    p="uploads/"+file.filename
-    open(p,"wb").write(await file.read())
-    txt=ocr_image(p)
-    return templates.TemplateResponse("ocr_result.html",{"request":request,"text":txt})
+async def ocr_post(request: Request, file: UploadFile = File(...)):
+    # zapis pliku
+    p = os.path.join("uploads", file.filename)
+    with open(p, "wb") as f:
+        f.write(await file.read())
+    # wykonaj OCR
+    txt = ocr_image(p)
+    # zwróć wynik w szablonie
+    return templates.TemplateResponse("ocr_result.html", {"request": request, "text": txt})
 
 @app.get("/anonymize", response_class=HTMLResponse)
 def anon_form(request: Request): return templates.TemplateResponse("anonymize.html",{"request":request})
