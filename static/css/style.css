@@ -237,6 +237,96 @@ a.btn:focus {
   left: 0;
   color: var(--grad-end);
 }
+  /* ==== Form Card ==== */
+.form-card {
+  background: #1a1a1a;
+  padding: 2rem;
+  border-radius: 12px;
+  max-width: 600px;
+  margin: 0 auto;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+}
+
+.form-card h1 {
+  color: #fff;
+  margin-bottom: 1.5rem;
+}
+
+/* ==== File Input Styling ==== */
+.file-group {
+  position: relative;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.file-group input[type="file"] {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  border: 0;
+}
+
+.btn-file {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.2rem;
+  background: linear-gradient(45deg, var(--grad-start), var(--grad-end));
+  color: #fff;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: transform .2s, box-shadow .2s;
+}
+.btn-file:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 16px var(--glow);
+}
+
+.file-name {
+  flex: 1;
+  color: #ccc;
+  font-style: italic;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ==== Checkbox ==== */
+.checkbox-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #ddd;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+.checkbox-label input {
+  accent-color: var(--grad-end);
+  width: 1rem; height: 1rem;
+}
+
+/* ==== Submit Button ==== */
+.btn-primary {
+  padding: 0.75rem 1.5rem;
+  border-radius: 50px;
+  background: linear-gradient(45deg, var(--grad-start), var(--grad-end));
+  color: #fff;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: transform .2s, box-shadow .2s;
+  display: inline-block;
+  margin-top: 1rem;
+}
+.btn-primary:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 16px var(--glow);
+}
+
 
 /* Sekcje na ciemnym tle */
 .bg-dark { background: #0d0d0d; }
