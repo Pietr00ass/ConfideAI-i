@@ -1,3 +1,18 @@
+/* Dark background setup */
+body {
+  background: 
+    linear-gradient(135deg, rgba(10,10,20,0.8) 0%, rgba(0,0,0,0.9) 75%),
+    url("/static/img/bg-dark-pattern.png") center/cover no-repeat;
+  color: #eee;
+}
+
+/* Jeżeli nie masz tekstury, możesz użyć tylko gradientu: */
+body {
+  background: radial-gradient(circle at top left,
+                #11111a 0%,
+                #000000 100%);
+  color: #eee;
+}
 /* ------------ Reset & Base ------------ */
 * { margin:0; padding:0; box-sizing:border-box; }
 html { scroll-behavior:smooth; }
