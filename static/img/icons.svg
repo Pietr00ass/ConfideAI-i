@@ -1,0 +1,10 @@
+<!-- static/img/icons.svg -->
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+  <symbol id="icon-upload" viewBox="0 0 24 24">
+    <path d="M5 20h14v-2H5v2zm7-18L5.33 9h4.67v6h4V9h4.67L12 2z"/>
+  </symbol>
+  <symbol id="icon-lock" viewBox="0 0 24 24">
+    <path d="M12 17a2 2 0 1 0 .001-3.999A2 2 0 0 0 12 17zm6-6V9a6 6 0 1 0-12 0v2H4v10h16V11h-2zm-8-2a4 4 0 1 1 8 0v2H10V9z"/>
+  </symbol>
+  <!-- Dodaj kolejne ikony w razie potrzeby -->
+</svg>
