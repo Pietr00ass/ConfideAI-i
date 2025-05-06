@@ -4,7 +4,7 @@
 
 {% block content %}
   <!-- HERO -->
-  <section class="hero rellax" data-rellax-speed="-2" data-aos="fade-up">
+  <section id="hero" class="hero rellax" data-rellax-speed="-2" data-aos="fade-up" data-vanta="net">
     <div class="container text-center">
       <h1>ConfideAI</h1>
       <p class="lead">
@@ -15,27 +15,30 @@
   </section>
 
   <!-- FEATURES -->
-  <section class="section">
+  <section id="features" class="section" data-aos="fade-up" data-vanta="birds">
     <div class="container">
-      <h2 class="section-title" data-aos="fade-up">Dlaczego ConfideAI?</h2>
-      <div class="features-grid" data-aos="fade-up" data-aos-delay="100">
-        <div class="feature-item">
+      <h2 class="section-title">Dlaczego ConfideAI?</h2>
+      <div class="features-grid">
+        <div class="feature-item" data-aos="fade-up" data-aos-delay="100">
           <h3>Maksymalne bezpieczeństwo</h3>
           <p>Szyfrowanie plików bez zbędnych ustawień.</p>
         </div>
-        <div class="feature-item">
+        <div class="feature-item" data-aos="fade-up" data-aos-delay="200">
           <h3>Anonimizacja wsparta AI</h3>
           <p>Automatyczne ukrywanie wrażliwych danych z obrazów.</p>
         </div>
-        <div class="feature-item">
+        <div class="feature-item" data-aos="fade-up" data-aos-delay="300">
           <h3>Łatwa wymiana</h3>
           <p>Generuj i pobieraj klucze, udostępniaj zaszyfrowane pakiety.</p>
         </div>
-        <div class="feature-item">
+        <div class="feature-item" data-aos="fade-up" data-aos-delay="400">
           <h3>Pełny monitoring</h3>
           <p>Loguj operacje i weryfikuj integralność plików.</p>
         </div>
       </div>
     </div>
   </section>
+
+  <!-- (tu możesz dodać kolejne sekcje: Why, CTA, How it works, itp.) -->
+
 {% endblock %}
