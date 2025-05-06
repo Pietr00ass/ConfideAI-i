@@ -180,3 +180,63 @@ a.btn:hover,
 a.btn:focus {
   transform: scale(1.05);
   box-shadow: 0 0 16px var(--glow);
+/* –––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––– */
+/* Container i typografia */
+.container { max-width: 1100px; margin: 0 auto; padding: 0 1rem; }
+.text-center { text-align: center; }
+.lead { font-size: 1.125rem; color: #ccc; }
+
+/* Features grid */
+.features-grid {
+  display: grid;
+  gap: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+.feature-item {
+  background: #1a1a1a;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.7);
+}
+.feature-item h3 { color: #fff; margin-bottom: .5rem; }
+.feature-item p  { color: #ccc; }
+
+/* Why grid */
+.why-grid {
+  display: grid;
+  gap: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+.why-block {
+  background: #111;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.6);
+}
+.why-block h3 { color: #fff; margin-bottom: .75rem; }
+.why-block p,
+.why-block ol,
+.why-block ul { color: #ccc; }
+
+/* How list */
+.how-list {
+  list-style: none;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 0;
+}
+.how-list li {
+  position: relative;
+  padding-left: 2rem;
+  margin-bottom: 1rem;
+  color: #ccc;
+}
+.how-list li::before {
+  content: '•';
+  position: absolute;
+  left: 0;
+  color: var(--grad-end);
+}
+
+/* Sekcje na ciemnym tle */
+.bg-dark { background: #0d0d0d; }
