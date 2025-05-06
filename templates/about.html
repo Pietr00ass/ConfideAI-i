@@ -1,13 +1,9 @@
-<!DOCTYPE html>
-<html lang="pl">
-<head>
-  <meta charset="UTF-8">
-  <title>O nas – ConfideAI</title>
-  <link rel="stylesheet" href="/static/css/style.css">
-</head>
-<body>
-  {% include "nav.html" %}
-  <section class="section">
+{% extends "base.html" %}
+
+{% block title %}O nas – ConfideAI{% endblock %}
+
+{% block content %}
+  <section class="section" data-aos="fade-up">
     <h2>O nas</h2>
     <p>Poznaj zespół, który stworzył ConfideAI.</p>
     <div class="team">
@@ -17,7 +13,7 @@
         {"name":"Bartek","role":"Data Scientist","img":"/static/img/team3.jpg"},
         {"name":"Mateusz Zieliński","role":"DevOps Engineer","img":"/static/img/team4.jpg"}
       ] %}
-      <div class="team-member">
+      <div class="team-member" data-aos="zoom-in">
         <img src="{{ member.img }}" alt="{{ member.name }}">
         <h3>{{ member.name }}</h3>
         <p>{{ member.role }}</p>
@@ -25,5 +21,4 @@
       {% endfor %}
     </div>
   </section>
-</body>
-</html>
+{% endblock %}
