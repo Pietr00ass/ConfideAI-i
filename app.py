@@ -59,9 +59,10 @@ def dashboard(request: Request):
     return templates.TemplateResponse("dashboard.html",{"request":request,"user":u})
 
 @app.get("/encrypt", response_class=HTMLResponse)
-def enc_form(request): return templates.TemplateResponse("encrypt.html",{"request":request})
+def encrypt_form(request: Request):
+    return templates.TemplateResponse("encrypt.html", {"request": request})
 @app.post("/encrypt", response_class=HTMLResponse)
-async def enc_post(request, file:UploadFile=File(...), delete_orig:bool=Form(False)):
+async def encrypt_post(request, file:UploadFile=File(...), delete_orig:bool=Form(False)):
     p="uploads/"+file.filename
     open(p,"wb").write(await file.read())
     enc,key=encrypt_file(p,delete_orig)
