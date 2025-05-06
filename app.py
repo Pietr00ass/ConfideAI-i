@@ -61,12 +61,30 @@ def dashboard(request: Request):
 @app.get("/encrypt", response_class=HTMLResponse)
 def encrypt_form(request: Request):
     return templates.TemplateResponse("encrypt.html", {"request": request})
+
 @app.post("/encrypt", response_class=HTMLResponse)
-async def encrypt_post(request, file:UploadFile=File(...), delete_orig:bool=Form(False)):
-    p="uploads/"+file.filename
-    open(p,"wb").write(await file.read())
-    enc,key=encrypt_file(p,delete_orig)
-    return templates.TemplateResponse("encrypt_result.html",{"request":request,"enc_path":enc,"key_path":key})
+async def encrypt_post(
+    request: Request,
+    file: UploadFile = File(...),
+    delete_orig: bool = Form(False)
+):
+    # Zapis pliku
+    p = os.path.join("uploads", file.filename)
+    with open(p, "wb") as f:
+        f.write(await file.read())
+
+    # Szyfrujemy
+    enc_path, key_path = encrypt_file(p, delete_orig)
+
+    # Renderujemy wynik, pamiętając o przekazaniu `request`
+    return templates.TemplateResponse(
+        "encrypt_result.html",
+        {
+            "request": request,
+            "enc_path": enc_path,
+            "key_path": key_path
+        }
+    )
 
 @app.get("/ocr", response_class=HTMLResponse)
 def ocr_form(request: Request):
