@@ -23,8 +23,25 @@ body[data-theme="light"]{--grad-start:#4f46e5;--grad-end:#9333ea;--glow:rgba(147
 ::-webkit-scrollbar-thumb{background: linear-gradient(45deg,var(--grad-start),var(--grad-end));border-radius:4px}
 ::-webkit-scrollbar-track{background:rgba(0,0,0,0.2)}
 
-/* 4. Navigation */
+/* 4. Przyciski */
+/* Wspólny styl przycisków */
+a.btn {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  border-radius: 999px;
+  background: linear-gradient(45deg, var(--grad-start), var(--grad-end));
+  color: #fff;
+  font-weight: 500;
+  text-decoration: none;
+  box-shadow: 0 0 8px var(--glow);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
 
+/* Hover / Focus */
+a.btn:hover,
+a.btn:focus {
+  transform: scale(1.05);
+  box-shadow: 0 0 16px var(--glow);
 /* NAVBAR – półprzezroczyste, rozmyte tło */
 nav {
   position: sticky;
