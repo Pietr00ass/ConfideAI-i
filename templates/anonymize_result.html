@@ -1,3 +1,14 @@
-<!DOCTYPE html>
-<html lang="pl"><head><meta charset="UTF-8"><link rel="stylesheet" href="/static/css/style.css"><title>Wynik anonimizacji</title></head>
-<body>{% include "nav.html" %}<section class="section"><h1>Obraz zanonimizowany</h1><p><a href="/{{ anon_path }}">Pobierz zanonimizowany obraz</a></p></section></body></html>
+{% extends "base.html" %}
+
+{% block title %}Wynik anonimizacji – ConfideAI{% endblock %}
+
+{% block content %}
+  <section class="section" data-aos="fade-up">
+    <h1>Obraz zanonimizowany</h1>
+    <p>
+      <a href="/{{ anon_path }}" class="btn">
+        Pobierz zanonimizowany obraz
+      </a>
+    </p>
+  </section>
+{% endblock %}
