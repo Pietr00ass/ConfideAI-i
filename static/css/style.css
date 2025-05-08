@@ -391,3 +391,19 @@ height: 1rem;
 .container { max-width: 1100px; margin: 0 auto; padding: 0 1rem; }
 .text-center { text-align: center; }
 .lead { font-size: 1.125rem; color: #ccc; }
+
+/* Blok informacyjny */
+.info-block {
+  background: rgba(26,26,26,0.85);
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.6);
+  color: #ddd;
+}
+.info-block h2 { color: #fff; margin-bottom: 0.5rem; }
+.info-block h3 { color: var(--grad-start); margin-top: 1rem; }
+.info-block ul { margin-left: 1.2rem; list-style: disc; color: #ccc; }
+.mb-4 { margin-bottom: 1rem!important; }
+.mb-5 { margin-bottom: 2rem!important; }
+.w-full { width: 100%; }
+
