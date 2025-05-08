@@ -1,0 +1,1 @@
+# Config for multiagents (if needed in future)
