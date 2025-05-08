@@ -3,37 +3,45 @@
 
 {% block content %}
   <section class="section reveal-on-scroll" data-aos="fade-up">
-    <div class="text-center" style="margin-bottom:1rem;">
-  <lottie-player
-    src="/static/animatons/lock.json"
-    background="transparent"
-    speed="1"
-    style="width:80px; height:80px; margin:auto;"
-    loop autoplay>
-  </lottie-player>
-</div>
-
     <div class="container">
-      <h1 class="text-center">Szyfrowanie pliku</h1>
 
+      <!-- ——————————————————————————————
+           Opis funkcji: Co to daje? Jak działa?
+           —————————————————————————————— -->
+      <div class="info-block mb-5" data-aos="fade-up">
+        <h2>Co zyskujesz dzięki szyfrowaniu?</h2>
+        <p>Nasza funkcja szyfrowania pozwala Ci w prosty sposób zabezpieczyć poufne pliki przed nieautoryzowanym dostępem – zarówno podczas przechowywania, jak i przesyłania.</p>
+        <h3>Jak to działa?</h3>
+        <ul>
+          <li><strong>Generowanie klucza AES-256:</strong> Twój plik jest szyfrowany algorytmem AES w trybie CFB.</li>
+          <li><strong>Integralność HMAC:</strong> Do każdej paczki dołączamy HMAC, byś mógł zweryfikować, że plik nie został zmieniony.</li>
+          <li><strong>Plik .enc i .key:</strong> Otrzymujesz zaszyfrowany plik oraz klucz do jego odszyfrowania.</li>
+        </ul>
+      </div>
+
+      <!-- ——————————————————————————————
+           Animacja Lottie + nagłówek
+           —————————————————————————————— -->
+      <div class="text-center mb-4" data-aos="fade-up" data-aos-delay="50">
+        <lottie-player
+          src="/static/animations/lock.json"
+          background="transparent"
+          speed="1"
+          style="width: 80px; height: 80px;"
+          loop autoplay>
+        </lottie-player>
+        <h1 class="mt-3">Szyfrowanie pliku</h1>
+      </div>
+
+      <!-- ——————————————————————————————
+           Formularz szyfrowania
+           —————————————————————————————— -->
       <form action="/encrypt"
             method="post"
             enctype="multipart/form-data"
             class="form-card reveal-on-scroll"
             data-aos="fade-up"
             data-aos-delay="100">
-
-        <!-- Lottie lock animacja -->
-        <div class="text-center" style="margin-bottom:1rem;">
-          <lottie-player
-            src="/static/animations/lock.json"
-            background="transparent"
-            speed="1"
-            style="width:80px; height:80px; margin:auto;"
-            loop
-            autoplay>
-          </lottie-player>
-        </div>
 
         <!-- Wybór pliku -->
         <div class="file-group">
@@ -44,17 +52,17 @@
           <span class="file-name" id="file-name">Nie wybrano pliku</span>
         </div>
 
-        <!-- Checkbox -->
+        <!-- Usuń oryginał -->
         <label class="checkbox-label">
           <input type="checkbox" name="delete_orig">
           Usuń oryginał
         </label>
 
-        <!-- Pasek postępu -->
-        <div id="upload-progress" class="progress-bar"></div>
+        <!-- Pasek postępu (po kliknięciu wypełnia się gradientem) -->
+        <div id="upload-progress" class="progress-bar mb-4"></div>
 
-        <!-- Submit -->
-        <button type="submit" class="btn-primary">
+        <!-- Przyciski -->
+        <button type="submit" class="btn-primary w-full">
           <i class="fas fa-lock"></i> Zaszyfruj
         </button>
       </form>
@@ -62,7 +70,9 @@
   </section>
 
   <script>
-    // Podmiana nazwy pliku
+    // ——————————————————————————————
+    // JS dla podmiany nazwy pliku i progresu
+    // ——————————————————————————————
     const inp = document.getElementById('file-input'),
           fn  = document.getElementById('file-name'),
           pr  = document.getElementById('upload-progress'),
