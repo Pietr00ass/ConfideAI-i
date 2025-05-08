@@ -1,10 +1,44 @@
 <nav>
-  <a href="/"        data-aos="fade-down">Home</a>
-  <a href="/dashboard" data-aos="fade-down" data-aos-delay="50">Dashboard</a>
-  <a href="/encrypt"   data-aos="fade-down" data-aos-delay="100">Szyfrowanie</a>
-  <a href="/ocr"       data-aos="fade-down" data-aos-delay="150">OCR</a>
-  <a href="/anonymize" data-aos="fade-down" data-aos-delay="200">Anonimizacja</a>
-  <a href="/about"     data-aos="fade-down" data-aos-delay="250">O nas</a>
-  <a href="/contact"   data-aos="fade-down" data-aos-delay="300">Kontakt</a>
-  <a href="/technology"data-aos="fade-down" data-aos-delay="350">Technologia</a>
+  {% set current_path = request.url.path %}
+  <a href="/"
+     class="{% if current_path == '/' %}active{% endif %}"
+     data-aos="fade-down">
+    Home
+  </a>
+  <a href="/dashboard"
+     class="{% if current_path == '/dashboard' %}active{% endif %}"
+     data-aos="fade-down" data-aos-delay="50">
+    Dashboard
+  </a>
+  <a href="/encrypt"
+     class="{% if current_path == '/encrypt' %}active{% endif %}"
+     data-aos="fade-down" data-aos-delay="100">
+    Szyfrowanie
+  </a>
+  <a href="/ocr"
+     class="{% if current_path == '/ocr' %}active{% endif %}"
+     data-aos="fade-down" data-aos-delay="150">
+    OCR
+  </a>
+  <a href="/anonymize"
+     class="{% if current_path == '/anonymize' %}active{% endif %}"
+     data-aos="fade-down" data-aos-delay="200">
+    Anonimizacja
+  </a>
+  <a href="/about"
+     class="{% if current_path == '/about' %}active{% endif %}"
+     data-aos="fade-down" data-aos-delay="250">
+    O nas
+  </a>
+  <a href="/contact"
+     class="{% if current_path == '/contact' %}active{% endif %}"
+     data-aos="fade-down" data-aos-delay="300">
+    Kontakt
+  </a>
+  <a href="/technology"
+     class="{% if current_path == '/technology' %}active{% endif %}"
+     data-aos="fade-down" data-aos-delay="350">
+    Technologia
+  </a>
 </nav>
+
