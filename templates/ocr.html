@@ -1,28 +1,74 @@
 {% extends "base.html" %}
-
 {% block title %}OCR – ConfideAI{% endblock %}
 
 {% block content %}
-  <section class="section" data-aos="fade-up">
-    <div class="text-center" style="margin-bottom:1rem;">
-  <lottie-player
-    src="/static/animatons/search.json"
-    background="transparent"
-    speed="1"
-    style="width:80px; height:80px; margin:auto;"
-    loop autoplay>
-  </lottie-player>
-</div>
+  <section class="section reveal-on-scroll" data-aos="fade-up">
+    <div class="container">
 
-    <h1>OCR obrazu</h1>
-
-    <form action="/ocr" method="post" enctype="multipart/form-data" data-aos="fade-up">
-      <div class="form-group">
-        <input type="file" name="file" id="ocr-file-input" required>
-        <label for="ocr-file-input">Wybierz obraz</label>
+      <!-- ——————————————————————————————
+           Opis funkcji: Co to daje? Jak działa?
+           —————————————————————————————— -->
+      <div class="info-block mb-5" data-aos="fade-up">
+        <h2>Co zyskujesz dzięki OCR?</h2>
+        <p>Funkcja OCR umożliwia automatyczne wydobycie tekstu z dowolnego obrazu czy PDF-a, co przyspiesza analizę dokumentów i eliminuje konieczność ręcznego przepisywania.</p>
+        <h3>Jak to działa?</h3>
+        <ul>
+          <li><strong>Analiza obrazu:</strong> Twój plik trafia do silnika Tesseract, który rozpoznaje znaki.</li>
+          <li><strong>Język polski i angielski:</strong> Model wspiera wiele języków, w tym polski.</li>
+          <li><strong>Wynik w formie tekstowej:</strong> Otrzymujesz czysty tekst gotowy do edycji i eksportu.</li>
+        </ul>
       </div>
 
-      <button type="submit" class="btn">Analizuj</button>
-    </form>
+      <!-- ——————————————————————————————
+           Animacja Lottie + nagłówek
+           —————————————————————————————— -->
+      <div class="text-center mb-4" data-aos="fade-up" data-aos-delay="50">
+        <lottie-player
+          src="/static/animations/search.json"
+          background="transparent"
+          speed="1"
+          style="width:80px; height:80px;"
+          loop autoplay>
+        </lottie-player>
+        <h1 class="mt-3">OCR obrazu</h1>
+      </div>
+
+      <!-- ——————————————————————————————
+           Formularz OCR
+           —————————————————————————————— -->
+      <form action="/ocr"
+            method="post"
+            enctype="multipart/form-data"
+            class="form-card reveal-on-scroll"
+            data-aos="fade-up"
+            data-aos-delay="100">
+
+        <!-- Wybór pliku -->
+        <div class="file-group">
+          <input type="file" name="file" id="ocr-file-input" accept="image/*,.pdf" required>
+          <label for="ocr-file-input" class="btn-file">
+            <i class="fas fa-upload"></i> Wybierz plik
+          </label>
+          <span class="file-name" id="ocr-file-name">Nie wybrano pliku</span>
+        </div>
+
+        <!-- Submit -->
+        <button type="submit" class="btn-primary w-full">
+          <i class="fas fa-search"></i> Analizuj
+        </button>
+      </form>
+
+    </div>
   </section>
+
+  <script>
+    // ——————————————————————————————
+    // JS dla podmiany nazwy pliku
+    // ——————————————————————————————
+    const inpOCR = document.getElementById('ocr-file-input'),
+          fnOCR  = document.getElementById('ocr-file-name');
+    inpOCR.addEventListener('change', () => {
+      fnOCR.textContent = inpOCR.files[0]?.name || 'Nie wybrano pliku';
+    });
+  </script>
 {% endblock %}
