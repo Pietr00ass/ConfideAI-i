@@ -1,26 +1,22 @@
-{% extends "base.html" %}
 
-{% block title %}Dashboard – ConfideAI{% endblock %}
-
-{% block content %}
-  <section class="section dashboard" data-aos="fade-up">
-    <div class="profile-card" data-aos="fade-right">
-      <h3>Profil użytkownika</h3>
-      <p><strong>Email:</strong> {{ user.email }}</p>
-      <p><strong>Data utworzenia:</strong> {{ user.created_at.strftime("%Y-%m-%d") }}</p>
-      <p><strong>Subskrypcja:</strong> {{ user.subscription or "Brak" }}</p>
-    </div>
-
-    <div class="activity-card" data-aos="fade-left">
-      <h3>Aktywność</h3>
-      <ul>
-        <li><a href="/encrypt" class="btn">Szyfrowanie pliku</a></li>
-        <li><a href="/ocr" class="btn">Analiza OCR</a></li>
-        <li><a href="/anonymize" class="btn">Anonimizacja obrazu</a></li>
-      </ul>
-
-      <!-- Przykładowy wykres -->
-      <canvas id="stats-chart" style="margin-top:2rem;"></canvas>
-    </div>
-  </section>
-{% endblock %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard</title>
+</head>
+<body>
+    <h1>Wyniki Analizy Danych Wrażliwych</h1>
+    {% for result in results %}
+        <div>
+            <h2>Plik: {{ result.filename }}</h2>
+            <p>Data analizy: {{ result.analysis_date }}</p>
+            <p><strong>E-maile:</strong> {{ result.emails }}</p>
+            <p><strong>PESEL:</strong> {{ result.pesel_numbers }}</p>
+            <p><strong>Karty:</strong> {{ result.credit_cards }}</p>
+            <p><strong>ML:</strong> {{ result.ml_predictions }}</p>
+        </div>
+        <hr>
+    {% endfor %}
+</body>
+</html>
