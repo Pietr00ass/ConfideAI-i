@@ -20,10 +20,10 @@
 
   <!-- 2) Loader overlay -->
   <div id="loader-overlay">
-    <div id="loader-container">
+    <div id="container">
       <div id="html-spinner"></div>
       <p id="html-para">Ładowanie aplikacji…</p>
-      </div>
+    </div>
   </div>
 
   <!-- 3) Nawigacja -->
@@ -48,17 +48,19 @@
   <script>
     // Ukryj loader po załadowaniu
     window.addEventListener('load', () => {
-      document.getElementById('loader-overlay').style.opacity = '0';
-      setTimeout(() => document.getElementById('loader-overlay').remove(), 500);
+      const overlay = document.getElementById('loader-overlay');
+      overlay.style.transition = 'opacity 0.5s ease';
+      overlay.style.opacity = '0';
+      setTimeout(() => overlay.remove(), 500);
     });
 
     // Inicjalizacja AOS
     AOS.init({ duration: 800, once: true });
 
-    // Parallax dla tych, co mają klasę .rellax
+    // Parallax dla elementów z klasą .rellax
     new Rellax('.rellax', { speed: -2 });
 
-    // Inicjalizacja Vanta na cały ekran
+    // Inicjalizacja Vanta.NET na cały ekran
     VANTA.NET({
       el: "#vanta-bg",
       color: 0x222222,
