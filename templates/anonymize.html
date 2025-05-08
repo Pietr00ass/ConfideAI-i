@@ -5,12 +5,13 @@
   <section class="section reveal-on-scroll" data-aos="fade-up">
     <div class="container">
 
-      <!-- ——————————————————————————————
-           Opis funkcji: Co to daje? Jak działa?
-           —————————————————————————————— -->
+      <!-- Opis funkcji -->
       <div class="info-block mb-5" data-aos="fade-up">
         <h2>Co zyskujesz dzięki anonimizacji?</h2>
-        <p>Automatycznie ukrywamy wrażliwe dane (nazwiska, numery, adresy) bez ręcznego retuszu – idealne do raportów i prezentacji.</p>
+        <p>
+          Automatycznie ukrywamy wrażliwe dane (nazwiska, numery, adresy) bez ręcznego retuszu 
+          – idealne do raportów i prezentacji.
+        </p>
         <h3>Jak to działa?</h3>
         <ul>
           <li><strong>OCR + NER:</strong> Rozpoznajemy tekst na obrazie i wykrywamy encje (osoby, numery).</li>
@@ -19,12 +20,10 @@
         </ul>
       </div>
 
-      <!-- ——————————————————————————————
-           Animacja Lottie + nagłówek
-           —————————————————————————————— -->
+      <!-- Lottie + nagłówek -->
       <div class="text-center mb-4" data-aos="fade-up" data-aos-delay="50">
         <lottie-player
-          src="/static/animatons/anon.json"
+          src="/static/animations/anon.json"
           background="transparent"
           speed="1"
           style="width:80px; height:80px;"
@@ -33,40 +32,95 @@
         <h1 class="mt-3">Anonimizacja obrazu</h1>
       </div>
 
-      <!-- ——————————————————————————————
-           Formularz anonimizacji
-           —————————————————————————————— -->
-      <form action="/anonymize"
-            method="post"
-            enctype="multipart/form-data"
-            class="form-card reveal-on-scroll"
-            data-aos="fade-up"
-            data-aos-delay="100">
+      <!-- Formularz anonimizacji -->
+      <div class="form-card reveal-on-scroll" data-aos="fade-up" data-aos-delay="100">
+        <form id="anon-form">
+          <!-- Wybór pliku -->
+          <div class="file-group">
+            <input type="file" name="file" id="anon-file-input" accept="image/*" required>
+            <label for="anon-file-input" class="btn-file">
+              <i class="fas fa-file-image"></i> Wybierz obraz
+            </label>
+            <span class="file-name" id="anon-file-name">Nie wybrano pliku</span>
+          </div>
 
-        <!-- Wybór pliku -->
-        <div class="file-group">
-          <input type="file" name="file" id="anon-file-input" accept="image/*" required>
-          <label for="anon-file-input" class="btn-file">
-            <i class="fas fa-file-image"></i> Wybierz obraz
-          </label>
-          <span class="file-name" id="anon-file-name">Nie wybrano pliku</span>
+          <!-- Pasek postępu -->
+          <div id="upload-progress" class="progress-bar mb-4" style="width:0%"></div>
+
+          <!-- Przycisk z procentem -->
+          <div class="btn-progress-wrapper text-center">
+            <button type="submit" class="btn-primary" id="anon-btn">
+              <span class="btn-label">Anonimizuj</span>
+              <span class="progress-text">0%</span>
+            </button>
+          </div>
+        </form>
+
+        <!-- Link do pobrania zanonimizowanego pliku -->
+        <div id="result-block" class="text-center mt-6" style="display:none;">
+          <a id="anon-link" href="#" class="btn btn-primary">
+            <i class="fas fa-download"></i> Pobierz zanonimizowany obraz
+          </a>
         </div>
-
-        <!-- Submit -->
-         <button type="submit" class="btn-primary" id="encrypt-btn">
-      <span class="btn-label">Anonimizuj</span>
-      <span class="progress-text">0%</span>
-    </button>
-      </form>
+      </div>
     </div>
   </section>
 
   <script>
-    // Podmiana nazwy pliku w anonimizacji
-    const anonInput = document.getElementById('anon-file-input'),
-          anonName  = document.getElementById('anon-file-name');
-    anonInput.addEventListener('change', () => {
-      anonName.textContent = anonInput.files[0]?.name || 'Nie wybrano pliku';
+    const form       = document.getElementById('anon-form');
+    const fileInput  = document.getElementById('anon-file-input');
+    const fileName   = document.getElementById('anon-file-name');
+    const progress   = document.getElementById('upload-progress');
+    const btn        = document.getElementById('anon-btn');
+    const pctText    = btn.querySelector('.progress-text');
+    const resultBlk  = document.getElementById('result-block');
+    const anonLink   = document.getElementById('anon-link');
+
+    // Podmiana nazwy pliku
+    fileInput.addEventListener('change', () => {
+      fileName.textContent = fileInput.files[0]?.name || 'Nie wybrano pliku';
+    });
+
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      resultBlk.style.display = 'none';
+
+      const data = new FormData();
+      data.append('file', fileInput.files[0]);
+
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', '/api/anonymize', true);
+      xhr.responseType = 'json';
+
+      btn.classList.add('processing');
+
+      // Upload progress
+      xhr.upload.onprogress = ev => {
+        if (ev.lengthComputable) {
+          const percent = Math.round(ev.loaded / ev.total * 100);
+          progress.style.width = percent + '%';
+          pctText.textContent = percent + '%';
+        }
+      };
+
+      xhr.onload = () => {
+        btn.classList.remove('processing');
+        if (xhr.status === 200) {
+          const { anon_path } = xhr.response;
+          anonLink.href = anon_path;
+          resultBlk.style.display = 'block';
+        } else {
+          alert('Wystąpił błąd podczas anonimizacji.');
+        }
+      };
+
+      xhr.onerror = () => {
+        btn.classList.remove('processing');
+        alert('Błąd sieci podczas uploadu.');
+      };
+
+      xhr.send(data);
     });
   </script>
 {% endblock %}
+
