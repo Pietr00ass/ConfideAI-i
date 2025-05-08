@@ -1,30 +1,72 @@
 {% extends "base.html" %}
-
 {% block title %}Anonimizacja – ConfideAI{% endblock %}
 
 {% block content %}
-<div class="text-center" style="margin-bottom:1rem;">
-  <lottie-player
-    src="/static/animatons/anon.json"
-    background="transparent"
-    speed="1"
-    style="width:80px; height:80px; margin:auto;"
-    loop autoplay>
-  </lottie-player>
-</div>
+  <section class="section reveal-on-scroll" data-aos="fade-up">
+    <div class="container">
 
-  <section class="section" data-aos="fade-up">
-    <h1>Anonimizacja obrazu</h1>
-
-    <form action="/anonymize" method="post" enctype="multipart/form-data" class="form-group" data-aos="fade-up">
-      <div>
-        <input type="file" name="file" id="file-input" required>
-        <label for="file-input">Wybierz obraz do anonimizacji</label>
+      <!-- ——————————————————————————————
+           Opis funkcji: Co to daje? Jak działa?
+           —————————————————————————————— -->
+      <div class="info-block mb-5" data-aos="fade-up">
+        <h2>Co zyskujesz dzięki anonimizacji?</h2>
+        <p>Automatycznie ukrywamy wrażliwe dane (nazwiska, numery, adresy) bez ręcznego retuszu – idealne do raportów i prezentacji.</p>
+        <h3>Jak to działa?</h3>
+        <ul>
+          <li><strong>OCR + NER:</strong> Rozpoznajemy tekst na obrazie i wykrywamy encje (osoby, numery).</li>
+          <li><strong>Maskowanie:</strong> W miejscu wykrytych słów nanosimy czarne prostokąty.</li>
+          <li><strong>Nowy plik:</strong> Pobierasz zanonimizowany obraz, gotowy do bezpiecznego udostępniania.</li>
+        </ul>
       </div>
 
-      <button type="submit" class="btn" style="margin-top:1rem;">
-        Anonimizuj
-      </button>
-    </form>
+      <!-- ——————————————————————————————
+           Animacja Lottie + nagłówek
+           —————————————————————————————— -->
+      <div class="text-center mb-4" data-aos="fade-up" data-aos-delay="50">
+        <lottie-player
+          src="/static/animatons/anon.json"
+          background="transparent"
+          speed="1"
+          style="width:80px; height:80px;"
+          loop autoplay>
+        </lottie-player>
+        <h1 class="mt-3">Anonimizacja obrazu</h1>
+      </div>
+
+      <!-- ——————————————————————————————
+           Formularz anonimizacji
+           —————————————————————————————— -->
+      <form action="/anonymize"
+            method="post"
+            enctype="multipart/form-data"
+            class="form-card reveal-on-scroll"
+            data-aos="fade-up"
+            data-aos-delay="100">
+
+        <!-- Wybór pliku -->
+        <div class="file-group">
+          <input type="file" name="file" id="anon-file-input" accept="image/*" required>
+          <label for="anon-file-input" class="btn-file">
+            <i class="fas fa-file-image"></i> Wybierz obraz
+          </label>
+          <span class="file-name" id="anon-file-name">Nie wybrano pliku</span>
+        </div>
+
+        <!-- Submit -->
+         <button type="submit" class="btn-primary" id="encrypt-btn">
+      <span class="btn-label">Anonimizuj</span>
+      <span class="progress-text">0%</span>
+    </button>
+      </form>
+    </div>
   </section>
+
+  <script>
+    // Podmiana nazwy pliku w anonimizacji
+    const anonInput = document.getElementById('anon-file-input'),
+          anonName  = document.getElementById('anon-file-name');
+    anonInput.addEventListener('change', () => {
+      anonName.textContent = anonInput.files[0]?.name || 'Nie wybrano pliku';
+    });
+  </script>
 {% endblock %}
