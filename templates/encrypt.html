@@ -5,23 +5,22 @@
   <section class="section reveal-on-scroll" data-aos="fade-up">
     <div class="container">
 
-      <!-- ——————————————————————————————
-           Opis funkcji: Co to daje? Jak działa?
-           —————————————————————————————— -->
+      <!-- Opis funkcji -->
       <div class="info-block mb-5" data-aos="fade-up">
         <h2>Co zyskujesz dzięki szyfrowaniu?</h2>
-        <p>Nasza funkcja szyfrowania pozwala Ci w prosty sposób zabezpieczyć poufne pliki przed nieautoryzowanym dostępem – zarówno podczas przechowywania, jak i przesyłania.</p>
+        <p>
+          Nasza funkcja szyfrowania pozwala Ci w prosty sposób zabezpieczyć poufne pliki 
+          przed nieautoryzowanym dostępem – zarówno podczas przechowywania, jak i przesyłania.
+        </p>
         <h3>Jak to działa?</h3>
         <ul>
           <li><strong>Generowanie klucza AES-256:</strong> Twój plik jest szyfrowany algorytmem AES w trybie CFB.</li>
           <li><strong>Integralność HMAC:</strong> Do każdej paczki dołączamy HMAC, byś mógł zweryfikować, że plik nie został zmieniony.</li>
-          <li><strong>Plik .enc i .key:</strong> Otrzymujesz zaszyfrowany plik oraz klucz do jego odszyfrowania.</li>
+          <li><strong>Plik <code>.enc</code> i <code>.key</code>:</strong> Otrzymujesz zaszyfrowany plik oraz klucz do jego odszyfrowania.</li>
         </ul>
       </div>
 
-      <!-- ——————————————————————————————
-           Animacja Lottie + nagłówek
-           —————————————————————————————— -->
+      <!-- Lottie + nagłówek -->
       <div class="text-center mb-4" data-aos="fade-up" data-aos-delay="50">
         <lottie-player
           src="/static/animatons/lock.json"
@@ -33,56 +32,96 @@
         <h1 class="mt-3">Szyfrowanie pliku</h1>
       </div>
 
-      <!-- ——————————————————————————————
-           Formularz szyfrowania
-           —————————————————————————————— -->
-      <form action="/encrypt"
-            method="post"
-            enctype="multipart/form-data"
-            class="form-card reveal-on-scroll"
-            data-aos="fade-up"
-            data-aos-delay="100">
+      <!-- Formularz szyfrowania -->
+      <div class="form-card reveal-on-scroll" data-aos="fade-up" data-aos-delay="100">
+        <form id="encrypt-form">
+          <!-- Wybór pliku -->
+          <div class="file-group">
+            <input type="file" name="file" id="file-input" required>
+            <label for="file-input" class="btn-file">
+              <i class="fas fa-file-upload"></i> Wybierz plik
+            </label>
+            <span class="file-name" id="file-name">Nie wybrano pliku</span>
+          </div>
 
-        <!-- Wybór pliku -->
-        <div class="file-group">
-          <input type="file" name="file" id="file-input" required>
-          <label for="file-input" class="btn-file">
-            <i class="fas fa-file-upload"></i> Wybierz plik
+          <!-- Usuń oryginał -->
+          <label class="checkbox-label">
+            <input type="checkbox" name="delete_orig" id="delete-orig">
+            Usuń oryginał
           </label>
-          <span class="file-name" id="file-name">Nie wybrano pliku</span>
-        </div>
 
-        <!-- Usuń oryginał -->
-        <label class="checkbox-label">
-          <input type="checkbox" name="delete_orig">
-          Usuń oryginał
-        </label>
+          <!-- Pasek postępu -->
+          <div id="upload-progress" class="progress-bar mb-4" style="width:0%"></div>
 
-        <!-- Pasek postępu (po kliknięciu wypełnia się gradientem) -->
-        <div id="upload-progress" class="progress-bar mb-4"></div>
-
-        <!-- Przyciski -->
-         <button type="submit" class="btn-primary" id="encrypt-btn">
-      <span class="btn-label">Zaszyfruj</span>
-      <span class="progress-text">0%</span>
-    </button>
-      </form>
+          <!-- Przyciski z procentem -->
+          <div class="btn-progress-wrapper text-center">
+            <button type="submit" class="btn-primary" id="encrypt-btn">
+              <span class="btn-label">Zaszyfruj</span>
+              <span class="progress-text">0%</span>
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   </section>
 
   <script>
-    // ——————————————————————————————
-    // JS dla podmiany nazwy pliku i progresu
-    // ——————————————————————————————
-    const inp = document.getElementById('file-input'),
-          fn  = document.getElementById('file-name'),
-          pr  = document.getElementById('upload-progress'),
-          frm = document.querySelector('form');
-    inp.addEventListener('change', () => {
-      fn.textContent = inp.files[0]?.name || 'Nie wybrano pliku';
+    const form      = document.getElementById('encrypt-form');
+    const fileInput = document.getElementById('file-input');
+    const fileName  = document.getElementById('file-name');
+    const deleteBox = document.getElementById('delete-orig');
+    const progress  = document.getElementById('upload-progress');
+    const btn       = document.getElementById('encrypt-btn');
+    const label     = btn.querySelector('.btn-label');
+    const pctText   = btn.querySelector('.progress-text');
+
+    // Aktualizacja nazwy pliku
+    fileInput.addEventListener('change', () => {
+      fileName.textContent = fileInput.files[0]?.name || 'Nie wybrano pliku';
     });
-    frm.addEventListener('submit', () => {
-      pr.style.width = '100%';
+
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+
+      // Przygotuj FormData
+      const data = new FormData();
+      data.append('file', fileInput.files[0]);
+      data.append('delete_orig', deleteBox.checked ? 'true' : 'false');
+
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', '/api/encrypt', true);
+      xhr.responseType = 'json';
+
+      // Przyciski → processing
+      btn.classList.add('processing');
+
+      // Upload progress
+      xhr.upload.onprogress = ev => {
+        if (!ev.lengthComputable) return;
+        const pct = Math.round(ev.loaded / ev.total * 100);
+        progress.style.width = pct + '%';
+        pctText.textContent = pct + '%';
+      };
+
+      // Po zakończeniu
+      xhr.onload = () => {
+        if (xhr.status === 200) {
+          const { enc_path, key_path } = xhr.response;
+          // Przekieruj na stronę z wynikami
+          window.location.href = `/encrypt_result?enc=${encodeURIComponent(enc_path)}&key=${encodeURIComponent(key_path)}`;
+        } else {
+          alert('Wystąpił błąd podczas szyfrowania.');
+          btn.classList.remove('processing');
+        }
+      };
+
+      xhr.onerror = () => {
+        alert('Błąd sieci podczas uploadu.');
+        btn.classList.remove('processing');
+      };
+
+      xhr.send(data);
     });
   </script>
 {% endblock %}
+
