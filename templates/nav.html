@@ -1,5 +1,5 @@
+{% set current_path = request.url.path %}
 <nav>
-  {% set current_path = request.url.path %}
   <a href="/"
      class="{% if current_path == '/' %}active{% endif %}"
      data-aos="fade-down">
@@ -40,5 +40,30 @@
      data-aos="fade-down" data-aos-delay="350">
     Technologia
   </a>
-</nav>
 
+  {# --- Sekcja auth --- #}
+  {% if request.session.get('user_id') %}
+    {# zakładamy, że w kontekście masz użytkownika, np. w base.py lub w każdym endpointcie #}
+    <div class="nav-spacer"></div>
+    <span class="nav-user" data-aos="fade-down" data-aos-delay="400">
+      {{ request.session.get('user_name') or 'Użytkownik' }}
+    </span>
+    <a href="/auth/logout"
+       class="btn-logout"
+       data-aos="fade-down" data-aos-delay="450">
+      Wyloguj
+    </a>
+  {% else %}
+    <div class="nav-spacer"></div>
+    <a href="/auth/login"
+       class="{% if current_path == '/auth/login' %}active{% endif %}"
+       data-aos="fade-down" data-aos-delay="400">
+      Zaloguj
+    </a>
+    <a href="/auth/register"
+       class="{% if current_path == '/auth/register' %}active{% endif %}"
+       data-aos="fade-down" data-aos-delay="450">
+      Zarejestruj
+    </a>
+  {% endif %}
+</nav>
