@@ -407,3 +407,56 @@ height: 1rem;
 .mb-5 { margin-bottom: 2rem!important; }
 .w-full { width: 100%; }
 
+/* Kontener dla przycisku z postępem */
+.btn-progress-wrapper {
+  position: relative;
+  width: fit-content;
+  margin: 1rem auto;
+}
+
+/* Bazowy wygląd przycisku */
+.btn-primary {
+  position: relative;
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 50px;
+  background: linear-gradient(45deg, var(--grad-start), var(--grad-end));
+  color: #fff;
+  font-weight: 600;
+  overflow: hidden;
+  transition: width 0.4s ease;
+  white-space: nowrap;
+}
+
+/* Tekst i progress nakładka */
+.btn-primary .btn-label,
+.btn-primary .progress-text {
+  position: relative;
+  z-index: 2;
+  transition: opacity 0.3s ease;
+}
+
+.btn-primary .progress-text {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+}
+
+/* Klasa aktywna – podczas przetwarzania */
+.btn-primary.processing {
+  width: 100%;           /* rośnie do 100% szerokości kontenera */
+  max-width: 300px;      /* możesz dostosować limit */
+}
+
+.btn-primary.processing .btn-label {
+  opacity: 0;            /* ukrywamy etykietę */
+}
+
+.btn-primary.processing .progress-text {
+  opacity: 1;            /* pokazujemy procent */
+}
+
+
