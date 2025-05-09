@@ -1,15 +1,13 @@
 import os
+
 from fastapi import (
-    FastAPI, Request, UploadFile, File, Form, HTTPException, Depends
+    FastAPI, Request, UploadFile, File, Form, HTTPException
 )
-from fastapi.responses import (
-    HTMLResponse, RedirectResponse, JSONResponse
-)
+from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from starlette.templating import Jinja2Templates
 from starlette.middleware.sessions import SessionMiddleware
-from multiagents.routes import scan_file, get_job, list_jobs
-from models import ScanJob, ScanResult
+from sqlmodel import Session
 
 from auth import (
     get_authorization_url,
@@ -19,13 +17,8 @@ from auth import (
 )
 from db import init_db, engine
 from models import User
-from functions import (
-    encrypt_file,
-    decrypt_file,
-    ocr_image,
-    anonymize_image
-)
-from sqlmodel import Session
+from functions import encrypt_file, decrypt_file, ocr_image, anonymize_image
+from multiagents.routes import scan_file, get_job, list_jobs
 
 app = FastAPI()
 
@@ -65,7 +58,7 @@ def contact(request: Request):
 def technology(request: Request):
     return templates.TemplateResponse("technology.html", {"request": request})
 
-# --- Registration via Email ---
+# --- Email Registration ---
 @app.get("/auth/register", response_class=HTMLResponse)
 def register_page(request: Request):
     return templates.TemplateResponse("register.html", {"request": request})
@@ -83,7 +76,7 @@ def confirm_email(request: Request, token: str):
     email = confirm_email_token(token)
     if not email:
         return templates.TemplateResponse("register_failed.html", {"request": request})
-    # create user in DB
+    # create user
     with Session(engine) as sess:
         user = User(email=email)
         sess.add(user)
@@ -91,7 +84,7 @@ def confirm_email(request: Request, token: str):
         sess.refresh(user)
     return templates.TemplateResponse("register_success.html", {"request": request})
 
-# --- Google OAuth / Auth0 ---
+# --- Google OAuth Login ---
 @app.get("/auth/login")
 def login(request: Request):
     url, state = get_authorization_url()
@@ -119,12 +112,9 @@ def dashboard(request: Request):
     user = require_user(request)
     if not user:
         return RedirectResponse("/")
-    return templates.TemplateResponse(
-        "dashboard.html",
-        {"request": request, "user": user}
-    )
+    return templates.TemplateResponse("dashboard.html", {"request": request, "user": user})
 
-# --- HTML Forms (render) ---
+# --- Encrypt / OCR / Anonymize Pages ---
 @app.get("/encrypt", response_class=HTMLResponse)
 def encrypt_form(request: Request):
     return templates.TemplateResponse("encrypt.html", {"request": request})
@@ -135,9 +125,8 @@ async def encrypt_post(
     file: UploadFile = File(...),
     delete_orig: bool = Form(False)
 ):
-    upload_dir = "uploads"
-    os.makedirs(upload_dir, exist_ok=True)
-    filepath = os.path.join(upload_dir, file.filename)
+    os.makedirs("uploads", exist_ok=True)
+    filepath = os.path.join("uploads", file.filename)
     with open(filepath, "wb") as f:
         f.write(await file.read())
 
@@ -156,17 +145,13 @@ async def ocr_post(
     request: Request,
     file: UploadFile = File(...)
 ):
-    upload_dir = "uploads"
-    os.makedirs(upload_dir, exist_ok=True)
-    filepath = os.path.join(upload_dir, file.filename)
+    os.makedirs("uploads", exist_ok=True)
+    filepath = os.path.join("uploads", file.filename)
     with open(filepath, "wb") as f:
         f.write(await file.read())
 
     text = ocr_image(filepath)
-    return templates.TemplateResponse(
-        "ocr_result.html",
-        {"request": request, "text": text}
-    )
+    return templates.TemplateResponse("ocr_result.html", {"request": request, "text": text})
 
 @app.get("/anonymize", response_class=HTMLResponse)
 def anon_form(request: Request):
@@ -177,33 +162,27 @@ async def anon_post(
     request: Request,
     file: UploadFile = File(...)
 ):
-    upload_dir = "uploads"
-    os.makedirs(upload_dir, exist_ok=True)
-    filepath = os.path.join(upload_dir, file.filename)
+    os.makedirs("uploads", exist_ok=True)
+    filepath = os.path.join("uploads", file.filename)
     with open(filepath, "wb") as f:
         f.write(await file.read())
 
     anon_path = anonymize_image(filepath)
-    return templates.TemplateResponse(
-        "anonymize_result.html",
-        {"request": request, "anon_path": anon_path}
-    )
+    return templates.TemplateResponse("anonymize_result.html", {"request": request, "anon_path": anon_path})
 
-# === Multiagent Scan Pages ===
-
+# --- Multiagent Scan Pages ---
 @app.get("/scan", response_class=HTMLResponse)
 def scan_form(request: Request):
     return templates.TemplateResponse("scan.html", {"request": request})
 
 @app.post("/scan", response_class=HTMLResponse)
 async def scan_post(request: Request, file: UploadFile = File(...)):
-    upload_dir = "uploads"
-    os.makedirs(upload_dir, exist_ok=True)
-    path = os.path.join(upload_dir, file.filename)
+    os.makedirs("uploads", exist_ok=True)
+    path = os.path.join("uploads", file.filename)
     with open(path, "wb") as f:
         f.write(await file.read())
 
-    job = scan_file(path)  # tu wywołujesz logikę multiagentową
+    job = scan_file(path)
     return RedirectResponse(f"/scan/{job.id}", status_code=303)
 
 @app.get("/scan/{job_id}", response_class=HTMLResponse)
@@ -222,40 +201,33 @@ def scan_history(request: Request):
         {"request": request, "history": history}
     )
 
-
-# --- JSON API Endpoints (for real-time progress) ---
+# --- JSON API Endpoints ---
 @app.post("/api/encrypt", response_class=JSONResponse)
 async def api_encrypt(
     file: UploadFile = File(...),
     delete_orig: bool = Form(False)
 ):
-    upload_dir = "uploads"
-    os.makedirs(upload_dir, exist_ok=True)
-    filepath = os.path.join(upload_dir, file.filename)
+    os.makedirs("uploads", exist_ok=True)
+    filepath = os.path.join("uploads", file.filename)
     with open(filepath, "wb") as f:
         f.write(await file.read())
-
     enc_path, key_path = encrypt_file(filepath, delete_orig)
     return {"enc_path": enc_path, "key_path": key_path}
 
 @app.post("/api/ocr", response_class=JSONResponse)
 async def api_ocr(file: UploadFile = File(...)):
-    upload_dir = "uploads"
-    os.makedirs(upload_dir, exist_ok=True)
-    filepath = os.path.join(upload_dir, file.filename)
+    os.makedirs("uploads", exist_ok=True)
+    filepath = os.path.join("uploads", file.filename)
     with open(filepath, "wb") as f:
         f.write(await file.read())
-
     text = ocr_image(filepath)
     return {"text": text}
 
 @app.post("/api/anonymize", response_class=JSONResponse)
 async def api_anonymize(file: UploadFile = File(...)):
-    upload_dir = "uploads"
-    os.makedirs(upload_dir, exist_ok=True)
-    filepath = os.path.join(upload_dir, file.filename)
+    os.makedirs("uploads", exist_ok=True)
+    filepath = os.path.join("uploads", file.filename)
     with open(filepath, "wb") as f:
         f.write(await file.read())
-
     anon_path = anonymize_image(filepath)
     return {"anon_path": anon_path}
