@@ -1,7 +1,7 @@
 # 1. Bazowy obraz Pythona
 FROM python:3.12-slim
 
-# 2. Zainstaluj narzędzia budowania i biblioteki systemowe dla OpenCV/spaCy (+ OCR, PDF, Postgres itp.)
+# 2. Zainstaluj narzędzia budowania i biblioteki systemowe dla OpenCV/spaCy
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
       build-essential \
@@ -10,13 +10,7 @@ RUN apt-get update && \
       libxext6 \
       libxrender1 \
       wget \
-      git \
-      tesseract-ocr \
-      tesseract-ocr-pol \
-      poppler-utils \
-      libpq-dev \
-      libmagic-dev \
-      ca-certificates && \
+      git && \
     rm -rf /var/lib/apt/lists/*
 
 # 3. Ustaw katalog roboczy
