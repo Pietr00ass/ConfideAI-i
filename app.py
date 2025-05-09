@@ -1,8 +1,6 @@
 import os
 
-from fastapi import (
-    FastAPI, Request, UploadFile, File, Form, HTTPException
-)
+from fastapi import FastAPI, Request, UploadFile, File, Form, HTTPException
 from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from starlette.templating import Jinja2Templates
@@ -18,7 +16,9 @@ from auth import (
 from db import init_db, engine
 from models import User
 from functions import encrypt_file, decrypt_file, ocr_image, anonymize_image
-from multiagents.routes import scan_file, get_job, list_jobs
+
+# Importujemy router z multiagentów
+from multiagents.routes import router as multiagent_router
 
 app = FastAPI()
 
@@ -32,6 +32,9 @@ init_db()
 # --- Static / Templates ---
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
+
+# --- Montujemy router multiagentów ---
+app.include_router(multiagent_router)
 
 # --- Helpers ---
 def require_user(request: Request):
@@ -168,37 +171,9 @@ async def anon_post(
         f.write(await file.read())
 
     anon_path = anonymize_image(filepath)
-    return templates.TemplateResponse("anonymize_result.html", {"request": request, "anon_path": anon_path})
-
-# --- Multiagent Scan Pages ---
-@app.get("/scan", response_class=HTMLResponse)
-def scan_form(request: Request):
-    return templates.TemplateResponse("scan.html", {"request": request})
-
-@app.post("/scan", response_class=HTMLResponse)
-async def scan_post(request: Request, file: UploadFile = File(...)):
-    os.makedirs("uploads", exist_ok=True)
-    path = os.path.join("uploads", file.filename)
-    with open(path, "wb") as f:
-        f.write(await file.read())
-
-    job = scan_file(path)
-    return RedirectResponse(f"/scan/{job.id}", status_code=303)
-
-@app.get("/scan/{job_id}", response_class=HTMLResponse)
-def scan_detail(request: Request, job_id: int):
-    job, results = get_job(job_id)
     return templates.TemplateResponse(
-        "scan_result.html",
-        {"request": request, "job": job, "results": results}
-    )
-
-@app.get("/scan/history", response_class=HTMLResponse)
-def scan_history(request: Request):
-    history = list_jobs()
-    return templates.TemplateResponse(
-        "scan_history.html",
-        {"request": request, "history": history}
+        "anonymize_result.html",
+        {"request": request, "anon_path": anon_path}
     )
 
 # --- JSON API Endpoints ---
