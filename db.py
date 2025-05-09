@@ -6,4 +6,6 @@ DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./confideai.db")
 engine = create_engine(DATABASE_URL, echo=True)
 
 def init_db():
+    from models import User, ScanJob, ScanResult
     SQLModel.metadata.create_all(engine)
+
