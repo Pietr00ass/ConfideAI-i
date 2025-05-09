@@ -5,11 +5,22 @@ itsdangerous
 authlib
 python-multipart
 sqlmodel
+sqlalchemy
+
 stripe
+
 pytesseract
-psycopg2-binary
 opencv-python-headless
 cryptography
 numpy
+
+psycopg2-binary
+
 spacy==3.8.5
 pl_core_news_sm @ https://github.com/explosion/spacy-models/releases/download/pl_core_news_sm-3.8.0/pl_core_news_sm-3.8.0.tar.gz
+
+joblib
+scikit-learn
+
+# opcjonalnie, ale polecam:
+email-validator
