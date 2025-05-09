@@ -1,8 +1,8 @@
 from typing import Optional, List
 from datetime import datetime
 
-from sqlmodel import SQLModel, Field, Column, Relationship
-from sqlalchemy import JSON, ForeignKey
+from sqlmodel import SQLModel, Field, Relationship
+from sqlalchemy import Column, JSON, ForeignKey
 
 
 class User(SQLModel, table=True):
