@@ -8,6 +8,7 @@ from fastapi.responses import (
 from fastapi.staticfiles import StaticFiles
 from starlette.templating import Jinja2Templates
 from starlette.middleware.sessions import SessionMiddleware
+from multiagents.routes import router as scan_router
 
 from auth import (
     get_authorization_url,
@@ -223,3 +224,6 @@ async def api_anonymize(file: UploadFile = File(...)):
 
     anon_path = anonymize_image(filepath)
     return {"anon_path": anon_path}
+    
+    app.include_router(scan_router)
+
