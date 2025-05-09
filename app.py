@@ -1,5 +1,4 @@
 import os
-
 from fastapi import FastAPI, Request, UploadFile, File, Form, HTTPException
 from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
@@ -17,34 +16,26 @@ from db import init_db, engine
 from models import User
 from functions import encrypt_file, decrypt_file, ocr_image, anonymize_image
 
-# Importujemy router z multiagentów
+# router multiagentów
 from multiagents.routes import router as multiagent_router
 
 app = FastAPI()
-
-# --- Sessions & DB ---
-app.add_middleware(
-    SessionMiddleware,
-    secret_key=os.getenv("SECRET_KEY", "change-me")
-)
+app.add_middleware(SessionMiddleware, secret_key=os.getenv("SECRET_KEY","change-me"))
 init_db()
 
-# --- Static / Templates ---
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 
-# --- Montujemy router multiagentów ---
+# podpinamy ścieżki z multiagentów
 app.include_router(multiagent_router)
 
-# --- Helpers ---
 def require_user(request: Request):
-    user_id = request.session.get("user_id")
-    if not user_id:
+    uid = request.session.get("user_id")
+    if not uid:
         return None
     with Session(engine) as sess:
-        return sess.get(User, user_id)
+        return sess.get(User, uid)
 
-# --- Public Pages ---
 @app.get("/", response_class=HTMLResponse)
 def landing(request: Request):
     return templates.TemplateResponse("landing.html", {"request": request})
@@ -61,7 +52,7 @@ def contact(request: Request):
 def technology(request: Request):
     return templates.TemplateResponse("technology.html", {"request": request})
 
-# --- Email Registration ---
+# rejestracja e-mail
 @app.get("/auth/register", response_class=HTMLResponse)
 def register_page(request: Request):
     return templates.TemplateResponse("register.html", {"request": request})
@@ -69,25 +60,19 @@ def register_page(request: Request):
 @app.post("/auth/register", response_class=HTMLResponse)
 def register_submit(request: Request, email: str = Form(...)):
     send_verification_email(email)
-    return templates.TemplateResponse(
-        "register_sent.html",
-        {"request": request, "email": email}
-    )
+    return templates.TemplateResponse("register_sent.html", {"request": request, "email": email})
 
 @app.get("/auth/confirm_email", response_class=HTMLResponse)
 def confirm_email(request: Request, token: str):
     email = confirm_email_token(token)
     if not email:
         return templates.TemplateResponse("register_failed.html", {"request": request})
-    # create user
     with Session(engine) as sess:
         user = User(email=email)
-        sess.add(user)
-        sess.commit()
-        sess.refresh(user)
+        sess.add(user); sess.commit(); sess.refresh(user)
     return templates.TemplateResponse("register_success.html", {"request": request})
 
-# --- Google OAuth Login ---
+# Google OAuth
 @app.get("/auth/login")
 def login(request: Request):
     url, state = get_authorization_url()
@@ -95,21 +80,19 @@ def login(request: Request):
     return RedirectResponse(url)
 
 @app.get("/auth/callback")
-def auth_callback(request: Request, code: str = None, state: str = None):
+def auth_callback(request: Request, code: str=None, state: str=None):
     if not code or state != request.session.get("oauth_state"):
         raise HTTPException(400, "Invalid OAuth callback")
     info = fetch_user_info(code, state)
     with Session(engine) as sess:
-        user = sess.query(User).filter(User.email == info["email"]).first()
+        user = sess.query(User).filter(User.email==info["email"]).first()
         if not user:
             user = User(email=info["email"], name=info.get("name"))
-            sess.add(user)
-            sess.commit()
-            sess.refresh(user)
+            sess.add(user); sess.commit(); sess.refresh(user)
     request.session["user_id"] = user.id
     return RedirectResponse("/dashboard")
 
-# --- Protected Dashboard ---
+# dashboard chroniony
 @app.get("/dashboard", response_class=HTMLResponse)
 def dashboard(request: Request):
     user = require_user(request)
@@ -117,92 +100,64 @@ def dashboard(request: Request):
         return RedirectResponse("/")
     return templates.TemplateResponse("dashboard.html", {"request": request, "user": user})
 
-# --- Encrypt / OCR / Anonymize Pages ---
+# encrypt / ocr / anonymize standard
 @app.get("/encrypt", response_class=HTMLResponse)
 def encrypt_form(request: Request):
     return templates.TemplateResponse("encrypt.html", {"request": request})
 
 @app.post("/encrypt", response_class=HTMLResponse)
-async def encrypt_post(
-    request: Request,
-    file: UploadFile = File(...),
-    delete_orig: bool = Form(False)
-):
+async def encrypt_post(request: Request, file: UploadFile=File(...), delete_orig: bool=Form(False)):
     os.makedirs("uploads", exist_ok=True)
-    filepath = os.path.join("uploads", file.filename)
-    with open(filepath, "wb") as f:
-        f.write(await file.read())
-
-    enc_path, key_path = encrypt_file(filepath, delete_orig)
-    return templates.TemplateResponse(
-        "encrypt_result.html",
-        {"request": request, "enc_path": enc_path, "key_path": key_path}
-    )
+    path = os.path.join("uploads", file.filename)
+    with open(path, "wb") as f: f.write(await file.read())
+    enc_path, key_path = encrypt_file(path, delete_orig)
+    return templates.TemplateResponse("encrypt_result.html", {"request":request,"enc_path":enc_path,"key_path":key_path})
 
 @app.get("/ocr", response_class=HTMLResponse)
 def ocr_form(request: Request):
     return templates.TemplateResponse("ocr.html", {"request": request})
 
 @app.post("/ocr", response_class=HTMLResponse)
-async def ocr_post(
-    request: Request,
-    file: UploadFile = File(...)
-):
+async def ocr_post(request: Request, file: UploadFile=File(...)):
     os.makedirs("uploads", exist_ok=True)
-    filepath = os.path.join("uploads", file.filename)
-    with open(filepath, "wb") as f:
-        f.write(await file.read())
-
-    text = ocr_image(filepath)
-    return templates.TemplateResponse("ocr_result.html", {"request": request, "text": text})
+    path = os.path.join("uploads", file.filename)
+    with open(path, "wb") as f: f.write(await file.read())
+    text = ocr_image(path)
+    return templates.TemplateResponse("ocr_result.html", {"request":request,"text":text})
 
 @app.get("/anonymize", response_class=HTMLResponse)
 def anon_form(request: Request):
     return templates.TemplateResponse("anonymize.html", {"request": request})
 
 @app.post("/anonymize", response_class=HTMLResponse)
-async def anon_post(
-    request: Request,
-    file: UploadFile = File(...)
-):
+async def anon_post(request: Request, file: UploadFile=File(...)):
     os.makedirs("uploads", exist_ok=True)
-    filepath = os.path.join("uploads", file.filename)
-    with open(filepath, "wb") as f:
-        f.write(await file.read())
+    path = os.path.join("uploads", file.filename)
+    with open(path, "wb") as f: f.write(await file.read())
+    anon_path = anonymize_image(path)
+    return templates.TemplateResponse("anonymize_result.html", {"request":request,"anon_path":anon_path})
 
-    anon_path = anonymize_image(filepath)
-    return templates.TemplateResponse(
-        "anonymize_result.html",
-        {"request": request, "anon_path": anon_path}
-    )
-
-# --- JSON API Endpoints ---
+# JSON API (upload progress)
 @app.post("/api/encrypt", response_class=JSONResponse)
-async def api_encrypt(
-    file: UploadFile = File(...),
-    delete_orig: bool = Form(False)
-):
+async def api_encrypt(file: UploadFile=File(...), delete_orig: bool=Form(False)):
     os.makedirs("uploads", exist_ok=True)
-    filepath = os.path.join("uploads", file.filename)
-    with open(filepath, "wb") as f:
-        f.write(await file.read())
-    enc_path, key_path = encrypt_file(filepath, delete_orig)
-    return {"enc_path": enc_path, "key_path": key_path}
+    path = os.path.join("uploads", file.filename)
+    with open(path, "wb") as f: f.write(await file.read())
+    enc_path, key_path = encrypt_file(path, delete_orig)
+    return {"enc_path":enc_path,"key_path":key_path}
 
 @app.post("/api/ocr", response_class=JSONResponse)
-async def api_ocr(file: UploadFile = File(...)):
+async def api_ocr(file: UploadFile=File(...)):
     os.makedirs("uploads", exist_ok=True)
-    filepath = os.path.join("uploads", file.filename)
-    with open(filepath, "wb") as f:
-        f.write(await file.read())
-    text = ocr_image(filepath)
-    return {"text": text}
+    path = os.path.join("uploads", file.filename)
+    with open(path, "wb") as f: f.write(await file.read())
+    text = ocr_image(path)
+    return {"text":text}
 
 @app.post("/api/anonymize", response_class=JSONResponse)
-async def api_anonymize(file: UploadFile = File(...)):
+async def api_anonymize(file: UploadFile=File(...)):
     os.makedirs("uploads", exist_ok=True)
-    filepath = os.path.join("uploads", file.filename)
-    with open(filepath, "wb") as f:
-        f.write(await file.read())
-    anon_path = anonymize_image(filepath)
-    return {"anon_path": anon_path}
+    path = os.path.join("uploads", file.filename)
+    with open(path, "wb") as f: f.write(await file.read())
+    anon_path = anonymize_image(path)
+    return {"anon_path":anon_path}
