@@ -24,3 +24,5 @@ scikit-learn
 
 # opcjonalnie, ale polecam:
 email-validator
+werkzeug
+
