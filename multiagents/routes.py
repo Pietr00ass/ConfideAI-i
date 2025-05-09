@@ -1,12 +1,13 @@
 # multiagents/routes.py
 
 import os
-from fastapi import APIRouter, Request, UploadFile, File, HTTPException, Form
+from fastapi import (
+    APIRouter, Request, UploadFile, File, HTTPException
+)
 from fastapi.responses import HTMLResponse, RedirectResponse
-from sqlalchemy import select
-from sqlmodel import Session
+from sqlmodel import Session, select
 from starlette.templating import Jinja2Templates
-from werkzeug.utils import secure_filename  # zainstaluj werkzeug w requirements, lub zastąp własną funkcją
+from werkzeug.utils import secure_filename  # albo zamień na własną funkcję, jeśli nie chcesz dodawać werkzeug
 
 from db import engine
 from models import ScanJob, ScanResult
@@ -22,6 +23,7 @@ templates = Jinja2Templates(directory="templates")
 UPLOAD_FOLDER = os.getenv("UPLOAD_FOLDER", "uploads")
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
+
 @router.get("/dashboard", response_class=HTMLResponse)
 def dashboard_view(request: Request):
     """Lista wszystkich zadań skanowania."""
@@ -34,13 +36,13 @@ def dashboard_view(request: Request):
         {"request": request, "jobs": jobs}
     )
 
+
 @router.get("/dashboard/job/{job_id}", response_class=HTMLResponse)
 def job_detail(request: Request, job_id: int):
     """Szczegóły jednego zadania wraz z wynikami poszczególnych agentów."""
     with Session(engine) as sess:
         job = sess.get(ScanJob, job_id)
         if not job:
-            # można też flashować przez session, ale tutaj uproszczone
             raise HTTPException(404, f"Zadanie o ID {job_id} nie istnieje.")
         results = sess.exec(
             select(ScanResult).where(ScanResult.job_id == job_id)
@@ -50,6 +52,7 @@ def job_detail(request: Request, job_id: int):
         {"request": request, "job": job, "results": results}
     )
 
+
 @router.get("/dashboard/scan", response_class=HTMLResponse)
 def scan_form(request: Request):
     """Formularz do przesyłania pliku i uruchamiania analizy."""
@@ -58,6 +61,7 @@ def scan_form(request: Request):
         {"request": request}
     )
 
+
 @router.post("/dashboard/scan", response_class=HTMLResponse)
 async def scan_upload(request: Request, file: UploadFile = File(...)):
     """
@@ -65,9 +69,9 @@ async def scan_upload(request: Request, file: UploadFile = File(...)):
     i przekierowuje pod szczegóły zadania.
     """
     if not file.filename:
-        # opcjonalnie można przekazać błąd do szablonu
         return RedirectResponse(request.url, status_code=303)
 
+    # zabezpieczenie nazwy pliku
     filename = secure_filename(file.filename)
     filepath = os.path.join(UPLOAD_FOLDER, filename)
     with open(filepath, "wb") as f:
@@ -80,13 +84,10 @@ async def scan_upload(request: Request, file: UploadFile = File(...)):
         sess.commit()
         sess.refresh(job)
 
-        # 2) Uruchamiamy agentów po kolei
-        # wczytaj całą zawartość tekstu lub konwertuj PDF jeśli trzeba
-        text = ""
+        # 2) Wczytaj tekst (jeśli to możliwe) i uruchamiamy agentów
         try:
             text = open(filepath, "r", encoding="utf-8", errors="ignore").read()
         except:
-            # jeżeli to binarka, zostaw pusty tekst 
             text = ""
 
         for agent_name, fn in [
@@ -95,11 +96,11 @@ async def scan_upload(request: Request, file: UploadFile = File(...)):
             ("credit_card", detect_cc),
             ("ml", detect_ml),
         ]:
-            matches = fn(text)
+            matches = fn(text) or []
             result = ScanResult(
                 job_id=job.id,
                 agent_name=agent_name,
-                matches=matches or []
+                matches=matches
             )
             sess.add(result)
         sess.commit()
