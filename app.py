@@ -8,6 +8,8 @@ from fastapi.responses import (
 from fastapi.staticfiles import StaticFiles
 from starlette.templating import Jinja2Templates
 from starlette.middleware.sessions import SessionMiddleware
+from multiagents.routes import scan_file, get_job, list_jobs
+from models import ScanJob, ScanResult
 
 from auth import (
     get_authorization_url,
@@ -186,6 +188,40 @@ async def anon_post(
         "anonymize_result.html",
         {"request": request, "anon_path": anon_path}
     )
+
+# === Multiagent Scan Pages ===
+
+@app.get("/scan", response_class=HTMLResponse)
+def scan_form(request: Request):
+    return templates.TemplateResponse("scan.html", {"request": request})
+
+@app.post("/scan", response_class=HTMLResponse)
+async def scan_post(request: Request, file: UploadFile = File(...)):
+    upload_dir = "uploads"
+    os.makedirs(upload_dir, exist_ok=True)
+    path = os.path.join(upload_dir, file.filename)
+    with open(path, "wb") as f:
+        f.write(await file.read())
+
+    job = scan_file(path)  # tu wywołujesz logikę multiagentową
+    return RedirectResponse(f"/scan/{job.id}", status_code=303)
+
+@app.get("/scan/{job_id}", response_class=HTMLResponse)
+def scan_detail(request: Request, job_id: int):
+    job, results = get_job(job_id)
+    return templates.TemplateResponse(
+        "scan_result.html",
+        {"request": request, "job": job, "results": results}
+    )
+
+@app.get("/scan/history", response_class=HTMLResponse)
+def scan_history(request: Request):
+    history = list_jobs()
+    return templates.TemplateResponse(
+        "scan_history.html",
+        {"request": request, "history": history}
+    )
+
 
 # --- JSON API Endpoints (for real-time progress) ---
 @app.post("/api/encrypt", response_class=JSONResponse)
