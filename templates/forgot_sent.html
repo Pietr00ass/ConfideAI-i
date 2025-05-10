@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block title %}Link wysłany{% endblock %}
+{% block content %}
+<section class="section text-center">
+  <p>Wysłaliśmy link do resetu hasła na adres <strong>{{ email }}</strong>. Sprawdź skrzynkę.</p>
+  <a href="/auth/login" class="btn btn-secondary mt-4">Zaloguj się</a>
+</section>
+{% endblock %}
