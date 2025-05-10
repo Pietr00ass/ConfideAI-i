@@ -25,7 +25,7 @@ from functions import (
     hash_password,
     verify_password
 )
-from sqlmodel import Session
+from sqlmodel import Session, select, SQLModel, create_engine
 
 app = FastAPI()
 
