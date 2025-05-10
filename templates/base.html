@@ -3,15 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <title>{% block title %}ConfideAI{% endblock %}</title>
-
-  <!-- Lottie Player (jeśli potrzebujesz) -->
+  {% block head %}
+  <!-- Lottie Player -->
   <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
-
   <!-- AOS -->
   <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet" />
-
   <!-- Podstawowy CSS -->
   <link rel="stylesheet" href="/static/css/style.css">
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  {% endblock %}
 </head>
 <body>
 
@@ -39,6 +40,7 @@
     <p>© 2025 ConfideAI — Wszystkie prawa zastrzeżone.</p>
   </footer>
 
+  {% block scripts %}
   <!-- Skrypty zewnętrzne -->
   <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/rellax@1.12.1/rellax.min.js"></script>
@@ -71,5 +73,6 @@
       showDots: false
     });
   </script>
+  {% endblock %}
 </body>
 </html>
