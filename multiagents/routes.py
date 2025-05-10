@@ -9,7 +9,7 @@ from db import engine
 from models import ScanJob, ScanResult, User
 from multiagents.agents.email_agent import detect as detect_email
 from multiagents.agents.pesel_agent import detect as detect_pesel
-from multiagents.agents.cc_agent import detect as detect_cc
+from multiagents.agents.credit_card_agent import detect as detect_credit_card
 from multiagents.agents.ml_agent import detect as detect_ml
 
 router = APIRouter(prefix="/scan")
@@ -54,7 +54,7 @@ async def scan_upload(request: Request, file: UploadFile = File(...), user: User
         for name, fn in [
             ("email", detect_email),
             ("pesel", detect_pesel),
-            ("cc", detect_cc),
+            ("credit_card", detect_credit_card),
             ("ml", detect_ml),
         ]:
             matches = fn(text) or []
