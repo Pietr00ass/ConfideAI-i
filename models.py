@@ -16,7 +16,8 @@ class AnalysisResult(SQLModel, table=True):
     user_id: int = Field(foreign_key="user.id")
     filename: str
     created_at: datetime = Field(default_factory=datetime.utcnow)
-    emails: List[str] = Field(default_factory=list)        # np. JSON
-    pesel_numbers: List[str] = Field(default_factory=list) # JSON
-    credit_cards: List[str] = Field(default_factory=list)  # JSON
+    emails: List[str] = Field(default_factory=list, sa_column=Column(JSON, nullable=False))
+    pesel_numbers: List[str] = Field(default_factory=list, sa_column=Column(JSON, nullable=False))
+    credit_cards: List[str] = Field(default_factory=list, sa_column=Column(JSON, nullable=False))
     ml_predictions: Optional[str] = None
+
