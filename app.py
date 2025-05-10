@@ -229,6 +229,52 @@ def auth_callback(request: Request, code: str = None, state: str = None):
     request.session["user_id"] = user.id
     return RedirectResponse("/dashboard")
 
+# 1. Formularz “Zapomniałeś hasła?”
+@app.get("/auth/forgot_password", response_class=HTMLResponse)
+def forgot_password_page(request: Request):
+    return templates.TemplateResponse("forgot_password.html", {"request": request})
+
+@app.post("/auth/forgot_password", response_class=HTMLResponse)
+def forgot_password_submit(request: Request, email: str = Form(...)):
+    # (opcjonalnie) sprawdź czy user istnieje w DB
+    send_password_reset_email(email)
+    return templates.TemplateResponse(
+        "forgot_sent.html",
+        {"request": request, "email": email}
+    )
+
+# 2. Strona resetu hasła (GET – pokazujemy formularz z tokenem)
+@app.get("/auth/reset_password", response_class=HTMLResponse)
+def reset_password_page(request: Request, token: str):
+    email = confirm_reset_token(token)
+    if not email:
+        return templates.TemplateResponse("reset_invalid.html", {"request": request})
+    return templates.TemplateResponse(
+        "reset_password.html",
+        {"request": request, "token": token}
+    )
+
+# 3. Obsługa POST – faktyczna zmiana hasła
+@app.post("/auth/reset_password", response_class=HTMLResponse)
+def reset_password_submit(
+    request: Request,
+    token: str = Form(...),
+    new_password: str = Form(...),
+):
+    email = confirm_reset_token(token)
+    if not email:
+        return templates.TemplateResponse("reset_invalid.html", {"request": request})
+    # hashujemy i zapisujemy nowe hasło
+    hashed = hash_password(new_password)
+    with Session(engine) as sess:
+        user = sess.exec(select(User).where(User.email == email)).one_or_none()
+        if user:
+            user.password = hashed
+            sess.add(user)
+            sess.commit()
+    return templates.TemplateResponse("reset_success.html", {"request": request})
+
+
 # --- Protected Dashboard ---
 @app.get("/dashboard", response_class=HTMLResponse)
 def dashboard(request: Request,
