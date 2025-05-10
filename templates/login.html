@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Logowanie – ConfideAI{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="container text-center">
+    <h1>Zaloguj się</h1>
+    {% if error %}
+      <div class="alert alert-danger">{{ error }}</div>
+    {% endif %}
+    <form action="/auth/login" method="post" class="form-card" data-aos="fade-up">
+      <div class="form-group">
+        <input type="email" name="email" id="email" placeholder=" " required>
+        <label for="email">Adres e-mail</label>
+      </div>
+      <div class="form-group">
+        <input type="password" name="password" id="password" placeholder=" " required>
+        <label for="password">Hasło</label>
+      </div>
+      <button type="submit" class="btn-primary">Zaloguj się</button>
+    </form>
+    <p class="mt-4">
+      Nie masz konta? <a href="/auth/register">Zarejestruj się</a>
+    </p>
+  </div>
+</section>
+{% endblock %}
