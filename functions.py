@@ -1,4 +1,5 @@
 import os, logging, secrets, cv2, pytesseract
+from passlib.context import CryptContext
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.backends import default_backend
 import spacy
@@ -51,3 +52,12 @@ def anonymize_image(image_path):
     out = image_path.rsplit('.',1)[0] + "_anon." + image_path.rsplit('.',1)[1]
     cv2.imwrite(out, img)
     return out
+
+# Inicjalizacja kontekstu do haszowania haseł
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+def hash_password(password: str) -> str:
+    return pwd_context.hash(password)
+
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    return pwd_context.verify(plain_password, hashed_password)
