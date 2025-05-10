@@ -1,22 +1,124 @@
+{% extends "base.html" %}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Dashboard</title>
-</head>
-<body>
-    <h1>Wyniki Analizy Danych Wrażliwych</h1>
-    {% for result in results %}
-        <div>
-            <h2>Plik: {{ result.filename }}</h2>
-            <p>Data analizy: {{ result.analysis_date }}</p>
-            <p><strong>E-maile:</strong> {{ result.emails }}</p>
-            <p><strong>PESEL:</strong> {{ result.pesel_numbers }}</p>
-            <p><strong>Karty:</strong> {{ result.credit_cards }}</p>
-            <p><strong>ML:</strong> {{ result.ml_predictions }}</p>
+{% block title %}Dashboard – ConfideAI{% endblock %}
+
+{% block content %}
+<div class="flex h-screen">
+  <!-- Sidebar -->
+  <aside class="w-64 bg-gray-800 text-white flex-shrink-0">
+    <div class="p-6 text-xl font-bold border-b border-gray-700">ConfideAI</div>
+    <nav class="mt-6">
+      <a href="/dashboard" class="block px-6 py-3 hover:bg-gray-700 {{ 'bg-gray-700' if request.url.path == '/dashboard' else '' }}">Dashboard</a>
+      <a href="/analysis/new" class="block px-6 py-3 hover:bg-gray-700">Nowa analiza</a>
+      <a href="/reports" class="block px-6 py-3 hover:bg-gray-700">Raporty</a>
+      <a href="/history" class="block px-6 py-3 hover:bg-gray-700">Historia</a>
+      <a href="/settings" class="block px-6 py-3 hover:bg-gray-700">Ustawienia</a>
+      <a href="/support" class="block px-6 py-3 hover:bg-gray-700">Pomoc</a>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <div class="flex-1 flex flex-col overflow-hidden">
+    <!-- Top Bar -->
+    <header class="flex items-center justify-between bg-white shadow p-4">
+      <form action="/dashboard" method="get" class="flex items-center">
+        <input type="text" name="q" placeholder="Szukaj..." class="border rounded px-3 py-1 mr-4 focus:outline-none" />
+        <button type="submit" class="btn btn-secondary">Szukaj</button>
+      </form>
+      <div class="flex items-center space-x-4">
+        <!-- Notifications -->
+        <a href="/notifications" class="relative">
+          <svg class="w-6 h-6 text-gray-600 hover:text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 ..." />
+          </svg>
+          <span class="absolute top-0 right-0 inline-block w-2 h-2 bg-red-600 rounded-full"></span>
+        </a>
+        <!-- User Avatar -->
+        <div class="relative group">
+          <img src="/static/img/avatar.png" alt="Avatar" class="w-8 h-8 rounded-full cursor-pointer" />
+          <div class="absolute right-0 mt-2 w-48 bg-white shadow rounded hidden group-hover:block">
+            <a href="/profile" class="block px-4 py-2 hover:bg-gray-100">Profil</a>
+            <a href="/settings" class="block px-4 py-2 hover:bg-gray-100">Ustawienia</a>
+            <a href="/auth/logout" class="block px-4 py-2 hover:bg-gray-100">Wyloguj się</a>
+          </div>
         </div>
-        <hr>
-    {% endfor %}
-</body>
-</html>
+      </div>
+    </header>
+
+    <!-- Content Area -->
+    <main class="p-6 overflow-auto">
+      <!-- Statistic Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+        <div class="card p-4 shadow rounded">
+          <h3 class="text-sm text-gray-500">Przetworzone pliki</h3>
+          <p class="text-2xl font-bold">{{ stats.files_processed }}</p>
+        </div>
+        <div class="card p-4 shadow rounded">
+          <h3 class="text-sm text-gray-500">Wykryte elementy wrażliwe</h3>
+          <p class="text-2xl font-bold">{{ stats.sensitive_items }}</p>
+        </div>
+        <div class="card p-4 shadow rounded">
+          <h3 class="text-sm text-gray-500">Twoje konto</h3>
+          <p class="text-2xl font-bold">{{ user.email }}</p>
+        </div>
+      </div>
+
+      <!-- Trend Chart -->
+      <div class="card p-4 shadow rounded mb-6">
+        <h2 class="text-lg font-medium mb-4">Trend analiz w ostatnich 7 dniach</h2>
+        <canvas id="trendChart"></canvas>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="flex space-x-4 mb-6">
+        <a href="/analysis/new" class="btn btn-primary flex-1">Nowa analiza</a>
+        <a href="/encrypt" class="btn btn-secondary flex-1">Szyfruj plik</a>
+        <a href="/ocr" class="btn btn-secondary flex-1">OCR</a>
+      </div>
+
+      <!-- Recent Results -->
+      <div>
+        <h2 class="text-xl font-semibold mb-4">Ostatnie wyniki</h2>
+        {% if results and results|length > 0 %}
+          <div class="space-y-4">
+            {% for result in results %}
+              <div class="card p-4 shadow rounded">
+                <div class="flex justify-between">
+                  <span class="font-medium">{{ result.filename }}</span>
+                  <span class="text-sm text-gray-500">{{ result.analysis_date }}</span>
+                </div>
+                <ul class="list-disc list-inside mt-2 text-sm text-gray-700">
+                  <li><strong>E-maile:</strong> {{ result.emails | join(', ') or 'Brak' }}</li>
+                  <li><strong>PESEL:</strong> {{ result.pesel_numbers | join(', ') or 'Brak' }}</li>
+                  <li><strong>Karty:</strong> {{ result.credit_cards | join(', ') or 'Brak' }}</li>
+                </ul>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <p class="text-gray-600">Brak wyników do wyświetlenia.</p>
+        {% endif %}
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- Chart Script -->
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const ctx = document.getElementById('trendChart').getContext('2d');
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: {{ stats.dates | safe }},
+        datasets: [{
+          label: 'Liczba analiz',
+          data: {{ stats.counts | safe }},
+          fill: false,
+          tension: 0.4
+        }]
+      }
+    });
+  });
+</script>
+{% endblock %}
