@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Nowa analiza{% endblock %}
+{% block content %}
+<section class="section container mx-auto">
+  <h1 class="text-2xl font-semibold mb-4">Nowa analiza</h1>
+  <p class="mb-2 text-gray-600">Wybierz plik i ustawienia analizy:</p>
+  <form action="/analysis/new" method="post" enctype="multipart/form-data" class="space-y-4">
+    <input type="file" name="file" required class="block w-full file-input" />
+    <button type="submit" class="btn btn-primary">Prześlij plik</button>
+  </form>
+</section>
+{% endblock %}

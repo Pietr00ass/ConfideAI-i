@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Wsparcie{% endblock %}
+{% block content %}
+<section class="section container mx-auto max-w-lg">
+  <h1 class="text-2xl font-semibold mb-4">Wsparcie techniczne</h1>
+  {% if success %}<div class="alert alert-success mb-4">{{ success }}</div>{% endif %}
+
+  <h2 class="font-medium mb-2">FAQ</h2>
+  <ul class="list-disc pl-5 mb-6">
+    <li><strong>Jak działa analiza?</strong> Analiza sprawdza pliki pod kątem danych wrażliwych (PESEL, e-mail, karty).</li>
+    <li><strong>Jak pobrać raport?</strong> Na stronie <a href="/reports" class="text-blue-600 hover:underline">Raporty</a>.</li>
+  </ul>
+
+  <h2 class="font-medium mb-2">Kontakt</h2>
+  <form action="/support" method="post" class="space-y-4">
+    <div><label>Temat:</label><input type="text" name="subject" required class="input" /></div>
+    <div><label>Wiadomość:</label><textarea name="message" rows="5" required class="textarea"></textarea></div>
+    <button type="submit" class="btn btn-primary">Wyślij zgłoszenie</button>
+  </form>
+</section>
+{% endblock %}

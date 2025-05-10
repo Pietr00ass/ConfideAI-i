@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Ustawienia{% endblock %}
+{% block content %}
+<section class="section container mx-auto max-w-md">
+  <h1 class="text-2xl font-semibold mb-4">Ustawienia konta</h1>
+  {% if success %}<div class="alert alert-success mb-4">{{ success }}</div>{% endif %}
+  <form action="/settings" method="post" class="space-y-4">
+    <div>
+      <label class="block text-sm font-medium">Imię:</label>
+      <input type="text" name="name" value="{{ user.name }}" class="input" />
+    </div>
+    <div>
+      <label class="block text-sm font-medium">Nowe hasło:</label>
+      <input type="password" name="password" class="input" />
+      <p class="text-xs text-gray-500">Puste, aby nie zmieniać</p>
+    </div>
+    <button type="submit" class="btn btn-primary">Zapisz zmiany</button>
+  </form>
+</section>
+{% endblock %}

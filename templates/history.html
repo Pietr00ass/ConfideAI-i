@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Historia{% endblock %}
+{% block content %}
+<section class="section container mx-auto">
+  <h1 class="text-2xl font-semibold mb-4">Historia aktywności</h1>
+  {% if logs %}
+    <ul class="divide-y">
+      {% for log in logs %}
+        <li class="py-2">
+          <span class="text-sm text-gray-500">{{ log.timestamp }}</span> – {{ log.action }}
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="text-gray-600">Brak zapisanych działań.</p>
+  {% endif %}
+</section>
+{% endblock %}

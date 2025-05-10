@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Raporty{% endblock %}
+{% block content %}
+<section class="section container mx-auto">
+  <h1 class="text-2xl font-semibold mb-4">Raporty</h1>
+  {% if reports %}
+    <ul class="list-disc pl-5 space-y-2">
+      {% for rpt in reports %}
+        <li>
+          <a href="{{ rpt.url }}" class="text-blue-600 hover:underline">{{ rpt.name }}</a>
+          <span class="text-sm text-gray-500">({{ rpt.created_at }})</span>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="text-gray-600">Brak wygenerowanych raportów.</p>
+  {% endif %}
+</section>
+{% endblock %}
