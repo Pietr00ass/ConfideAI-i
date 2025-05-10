@@ -16,7 +16,7 @@ from auth import (
     confirm_email_token
 )
 from db import init_db, engine
-from models import User
+from models import User, AnalysisResult
 from functions import (
     encrypt_file,
     decrypt_file,
@@ -25,7 +25,10 @@ from functions import (
     hash_password,
     verify_password
 )
-from sqlmodel import Session, select, SQLModel, create_engine
+from sqlmodel import Session, select, SQLModel, create_engine, func
+from datetime import date, timedelta
+from fastapi import Depends
+
 
 app = FastAPI(debug=True)
 
@@ -149,14 +152,62 @@ def auth_callback(request: Request, code: str = None, state: str = None):
 
 # --- Protected Dashboard ---
 @app.get("/dashboard", response_class=HTMLResponse)
-def dashboard(request: Request):
-    user = require_user(request)
-    if not user:
-        return RedirectResponse("/")
-    return templates.TemplateResponse(
-        "dashboard.html",
-        {"request": request, "user": user}
+def dashboard(request: Request,
+              user: User = Depends(get_current_user)):
+    # 1) Pobierz wszystkie wyniki dla użytkownika
+    with Session(engine) as sess:
+        records = sess.exec(
+            select(AnalysisResult)
+            .where(AnalysisResult.user_id == user.id)
+            .order_by(AnalysisResult.created_at.desc())
+        ).all()
+
+    # 2) Przygotuj listę dla Jinja2
+    results_list = [{
+        "filename": r.filename,
+        "analysis_date": r.created_at.strftime("%Y-%m-%d %H:%M"),
+        "emails": r.emails,
+        "pesel_numbers": r.pesel_numbers,
+        "credit_cards": r.credit_cards,
+        "ml_predictions": r.ml_predictions
+    } for r in records]
+
+    # 3) Statystyki
+    files_processed = len(records)
+    sensitive_items = sum(
+        len(r.emails) + len(r.pesel_numbers) + len(r.credit_cards)
+        for r in records
     )
+
+    # 4) Trend: ostatnie 7 dni
+    today = date.today()
+    dates = [(today - timedelta(days=i)).strftime("%Y-%m-%d")
+             for i in reversed(range(7))]
+    counts = []
+    with Session(engine) as sess:
+        for d in dates:
+            cnt = sess.exec(
+                select(func.count())
+                .select_from(AnalysisResult)
+                .where(
+                    AnalysisResult.user_id == user.id,
+                    func.date(AnalysisResult.created_at) == d
+                )
+            ).one()
+            counts.append(cnt)
+
+    # 5) Render
+    return templates.TemplateResponse("dashboard.html", {
+        "request": request,
+        "user": user,
+        "stats": {
+            "files_processed": files_processed,
+            "sensitive_items": sensitive_items,
+            "dates": dates,
+            "counts": counts,
+        },
+        "results": results_list
+    })
 
 # --- HTML Forms (render) ---
 @app.get("/encrypt", response_class=HTMLResponse)
@@ -259,4 +310,14 @@ async def api_anonymize(file: UploadFile = File(...)):
 
     anon_path = anonymize_image(filepath)
     return {"anon_path": anon_path}
+
+def get_current_user(request: Request):
+    user_id = request.session.get("user_id")
+    if not user_id:
+        raise HTTPException(status_code=401, detail="Musisz być zalogowany")
+    with Session(engine) as sess:
+        user = sess.get(User, user_id)
+    if not user:
+        raise HTTPException(status_code=401, detail="Nieprawidłowa sesja")
+    return user
     
