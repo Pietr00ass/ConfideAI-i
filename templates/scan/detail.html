@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Wyniki skanowania – ConfideAI{% endblock %}
+
+{% block content %}
+<section class="section reveal-on-scroll" data-aos="fade-up">
+  <div class="container">
+    <h1>Wyniki skanowania</h1>
+    <p><strong>Plik:</strong> {{ job.filename }}</p>
+    <p><strong>Data:</strong> {{ job.created_at.strftime("%Y-%m-%d %H:%M:%S") }}</p>
+
+    <table class="feature-item" style="width:100%; margin-top:1rem">
+      <thead>
+        <tr>
+          <th style="text-align:left; padding:0.5rem">Agent</th>
+          <th style="text-align:left; padding:0.5rem">Znalezione dopasowania</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in results %}
+        <tr>
+          <td style="padding:0.5rem">{{ r.agent_name }}</td>
+          <td style="padding:0.5rem">
+            {% if r.matches %}
+              <ul>
+                {% for m in r.matches %}
+                  <li>{{ m }}</li>
+                {% endfor %}
+              </ul>
+            {% else %}
+              <em>brak</em>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <div class="text-center" style="margin-top:2rem">
+      <a href="/scan/history" class="btn">
+        <i class="fas fa-history"></i> Historia skanów
+      </a>
+    </div>
+  </div>
+</section>
+{% endblock %}

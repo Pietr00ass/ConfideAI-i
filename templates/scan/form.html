@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Analiza pliku – ConfideAI{% endblock %}
+
+{% block content %}
+<section class="section reveal-on-scroll" data-aos="fade-up">
+  <div class="container">
+    <div class="info-block mb-5" data-aos="fade-up">
+      <h2>Prześlij plik do analizy</h2>
+      <p>System przeprowadzi wieloagentową analizę tekstu, wykrywając m.in. adresy e-mail, numery PESEL, karty kredytowe oraz poufne fragmenty poprzez model ML.</p>
+    </div>
+
+    <div class="form-card" data-aos="fade-up" data-aos-delay="100">
+      <form action="/scan/" method="post" enctype="multipart/form-data">
+        <div class="file-group">
+          <input type="file" name="file" id="scan-file-input" required>
+          <label for="scan-file-input" class="btn-file">
+            <i class="fas fa-file-upload"></i> Wybierz plik
+          </label>
+          <span class="file-name" id="scan-file-name">Nie wybrano pliku</span>
+        </div>
+
+        <button type="submit" class="btn-primary">
+          <i class="fas fa-search"></i> Skanuj
+        </button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<script>
+  const scanInput = document.getElementById('scan-file-input'),
+        scanName  = document.getElementById('scan-file-name');
+  scanInput.addEventListener('change', () => {
+    scanName.textContent = scanInput.files[0]?.name || 'Nie wybrano pliku';
+  });
+</script>
+{% endblock %}

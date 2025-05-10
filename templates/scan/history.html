@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Historia skanów – ConfideAI{% endblock %}
+
+{% block content %}
+<section class="section reveal-on-scroll" data-aos="fade-up">
+  <div class="container">
+    <h1>Historia skanowanych plików</h1>
+
+    {% if jobs %}
+      <ul style="list-style:none; padding:0; margin-top:1rem">
+        {% for job in jobs %}
+          <li style="margin-bottom:0.75rem">
+            <a href="/scan/{{ job.id }}" class="btn">
+              <i class="fas fa-file-alt"></i>
+              {{ job.filename }} 
+              <small style="color:#aaa">({{ job.created_at.strftime("%Y-%m-%d %H:%M:%S") }})</small>
+            </a>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>Nie wykonano jeszcze żadnych skanów.</p>
+    {% endif %}
+
+    <div class="text-center" style="margin-top:2rem">
+      <a href="/scan/" class="btn">
+        <i class="fas fa-arrow-left"></i> Nowy skan
+      </a>
+    </div>
+  </div>
+</section>
+{% endblock %}
