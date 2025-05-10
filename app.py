@@ -44,6 +44,16 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 
 # --- Helpers ---
+def get_current_user(request: Request):
+    user_id = request.session.get("user_id")
+    if not user_id:
+        raise HTTPException(status_code=401, detail="Musisz być zalogowany")
+    with Session(engine) as sess:
+        user = sess.get(User, user_id)
+    if not user:
+        raise HTTPException(status_code=401, detail="Nieprawidłowa sesja")
+    return user
+    
 def require_user(request: Request):
     user_id = request.session.get("user_id")
     if not user_id:
