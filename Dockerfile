@@ -11,10 +11,10 @@ RUN apt-get update && \
       libxrender1 \
       wget \
       git \
-      tesseract-ocr \            # dla pytesseract
-      poppler-utils \            # jeśli kiedyś będziesz robić OCR na PDF
-      libpq-dev \                # nagłówki dla psycopg2-binary
-      libmagic-dev \             # dla python-magic autodetekcji
+      tesseract-ocr \
+      poppler-utils \
+      libpq-dev \
+      libmagic-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # 3. Ustaw katalog roboczy
