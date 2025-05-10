@@ -12,6 +12,7 @@ APP_URL        = os.getenv("APP_URL", "").rstrip("/")  # usuń końcowy '/'
 
 # ---- SERIALIZATOR (token e-mail) ----
 serializer = URLSafeTimedSerializer(SECRET_KEY)
+RESET_SALT = "password-reset"
 
 def send_verification_email(recipient: str):
     """Wysyła mail z linkiem potwierdzającym adres e-mail."""
@@ -49,6 +50,29 @@ def confirm_email_token(token: str, expiration: int = 3600) -> str | None:
         # niepoprawny token
         return None
     except Exception:
+        return None
+        
+# ---- PRZYKŁAD FUNKCJI WYSYŁAJĄCEJ MAIL RESETU HASŁA ----
+def send_password_reset_email(recipient: str):
+    token = serializer.dumps(recipient, salt=RESET_SALT)
+    link = f"{APP_URL}/auth/reset_password?token={token}"
+    msg = EmailMessage()
+    msg["Subject"] = "Reset hasła w ConfideAI"
+    msg["From"]    = SENDER_EMAIL
+    msg["To"]      = recipient
+    msg.set_content(
+        f"Aby zresetować hasło, kliknij poniższy link (ważny 1h):\n\n{link}"
+    )
+    with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
+        smtp.login(SENDER_EMAIL, SENDER_PASS)
+        smtp.send_message(msg)
+
+# ---- FUNKCJA WERYFIKUJĄCA TOKEN RESETU ----
+def confirm_reset_token(token: str, expiration: int = 3600) -> str | None:
+    try:
+        email = serializer.loads(token, salt=RESET_SALT, max_age=expiration)
+        return email
+    except (SignatureExpired, BadSignature):
         return None
 
 # ---- GOOGLE OAUTH2 ----
