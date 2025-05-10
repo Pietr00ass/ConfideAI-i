@@ -320,14 +320,4 @@ async def api_anonymize(file: UploadFile = File(...)):
 
     anon_path = anonymize_image(filepath)
     return {"anon_path": anon_path}
-
-def get_current_user(request: Request):
-    user_id = request.session.get("user_id")
-    if not user_id:
-        raise HTTPException(status_code=401, detail="Musisz być zalogowany")
-    with Session(engine) as sess:
-        user = sess.get(User, user_id)
-    if not user:
-        raise HTTPException(status_code=401, detail="Nieprawidłowa sesja")
-    return user
     
