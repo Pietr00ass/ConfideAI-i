@@ -13,7 +13,7 @@ from auth import (
     get_authorization_url,
     fetch_user_info,
     send_verification_email,
-    confirm_email_token
+    confirm_email_token,
     send_password_reset_email
 )
 from db import init_db, engine
