@@ -21,7 +21,8 @@ from functions import (
     encrypt_file,
     decrypt_file,
     ocr_image,
-    anonymize_image
+    anonymize_image,
+    hash_password
 )
 from sqlmodel import Session
 
@@ -63,19 +64,30 @@ def contact(request: Request):
 def technology(request: Request):
     return templates.TemplateResponse("technology.html", {"request": request})
 
-# --- Registration via Email ---
 @app.get("/auth/register", response_class=HTMLResponse)
 def register_page(request: Request):
     return templates.TemplateResponse("register.html", {"request": request})
 
 @app.post("/auth/register", response_class=HTMLResponse)
-def register_submit(request: Request, email: str = Form(...)):
+def register_submit(request: Request, email: str = Form(...), password: str = Form(...)):
+    # Haszowanie hasła
+    hashed_password = hash_password(password)
+
+    # Tworzenie użytkownika
+    user = User(email=email, password=hashed_password)
+    db_session = Session()
+    db_session.add(user)
+    db_session.commit()
+    db_session.refresh(user)
+
+    # Wysłanie e-maila weryfikacyjnego
     send_verification_email(email)
+
+    # Zwrócenie odpowiedzi informującej użytkownika o wysłaniu e-maila
     return templates.TemplateResponse(
         "register_sent.html",
         {"request": request, "email": email}
     )
-
 @app.get("/auth/confirm_email", response_class=HTMLResponse)
 def confirm_email(request: Request, token: str):
     email = confirm_email_token(token)
