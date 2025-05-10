@@ -70,21 +70,18 @@ def register_page(request: Request):
     return templates.TemplateResponse("register.html", {"request": request})
 
 @app.post("/auth/register", response_class=HTMLResponse)
-def register_submit(request: Request, email: str = Form(...), password: str = Form(...)):
-    # Haszowanie hasła
-    hashed_password = hash_password(password)
-
-    # Tworzenie użytkownika
-    user = User(email=email, password=hashed_password)
-    db_session = Session()
-    db_session.add(user)
-    db_session.commit()
-    db_session.refresh(user)
-
-    # Wysłanie e-maila weryfikacyjnego
+def register_submit(request: Request,
+                    email: str = Form(...),
+                    password: str = Form(...)):
+    # haszujemy
+    hashed = hash_password(password)
+    # zapis do DB
+    with Session(engine) as sess:
+        user = User(email=email, password=hashed, is_active=False)
+        sess.add(user)
+        sess.commit()
+    # wysyłamy mail
     send_verification_email(email)
-
-    # Zwrócenie odpowiedzi informującej użytkownika o wysłaniu e-maila
     return templates.TemplateResponse(
         "register_sent.html",
         {"request": request, "email": email}
@@ -94,21 +91,47 @@ def confirm_email(request: Request, token: str):
     email = confirm_email_token(token)
     if not email:
         return templates.TemplateResponse("register_failed.html", {"request": request})
-    # create user in DB
     with Session(engine) as sess:
-        user = User(email=email)
-        sess.add(user)
-        sess.commit()
-        sess.refresh(user)
+        statement = select(User).where(User.email == email)
+        user = sess.exec(statement).one_or_none()
+        if user:
+            user.is_active = True
+            sess.add(user)
+            sess.commit()
     return templates.TemplateResponse("register_success.html", {"request": request})
 
 # --- Google OAuth / Auth0 ---
-@app.get("/auth/login")
-def login(request: Request):
-    url, state = get_authorization_url()
-    request.session["oauth_state"] = state
-    return RedirectResponse(url)
+@app.get("/auth/login", response_class=HTMLResponse)
+def login_page(request: Request):
+    return templates.TemplateResponse("login.html", {"request": request})
 
+@app.post("/auth/login", response_class=HTMLResponse)
+def login_submit(request: Request,
+                 email: str = Form(...),
+                 password: str = Form(...)):
+    with Session(engine) as sess:
+        statement = select(User).where(User.email == email)
+        user = sess.exec(statement).one_or_none()
+    if not user or not verify_password(password, user.password):
+        return templates.TemplateResponse(
+            "login.html",
+            {"request": request, "error": "Nieprawidłowy e-mail lub hasło."}
+        )
+    if not user.is_active:
+        return templates.TemplateResponse(
+            "login.html",
+            {"request": request, "error": "Konto nieaktywne. Potwierdź e-mail."}
+        )
+    # ustawiamy sesję
+    request.session["user_id"] = user.id
+    return RedirectResponse("/dashboard", status_code=302)
+
+@app.get("/auth/logout")
+def logout(request: Request):
+    request.session.clear()
+    return RedirectResponse("/", status_code=302)
+
+                     
 @app.get("/auth/callback")
 def auth_callback(request: Request, code: str = None, state: str = None):
     if not code or state != request.session.get("oauth_state"):
