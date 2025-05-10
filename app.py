@@ -1,3 +1,6 @@
+import pyotp
+import qrcode
+import io
 import os
 from fastapi import (
     FastAPI, Request, UploadFile, File, Form, HTTPException, Depends
