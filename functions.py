@@ -53,11 +53,13 @@ def anonymize_image(image_path):
     cv2.imwrite(out, img)
     return out
 
-# Inicjalizacja kontekstu do haszowania haseł
+# inicjalizacja kontekstu
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 def hash_password(password: str) -> str:
+    """Zwraca zhashowane hasło."""
     return pwd_context.hash(password)
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
+    """Sprawdza zgodność hasła jawnego z hash’em."""
     return pwd_context.verify(plain_password, hashed_password)
