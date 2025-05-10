@@ -9,6 +9,9 @@ class User(SQLModel, table=True):
     password: str  # Pole dla hasła
     is_active: bool = Field(default=False, index=True) 
     name: Optional[str] = None
+    avatar_url: Optional[str] = None
+    two_factor_secret: Optional[str] = None
+    is_2fa_enabled: bool = Field(default=False)
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
 class AnalysisResult(SQLModel, table=True):
