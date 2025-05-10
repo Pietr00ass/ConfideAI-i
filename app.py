@@ -112,6 +112,75 @@ def confirm_email(request: Request, token: str):
             sess.add(user)
             sess.commit()
     return templates.TemplateResponse("register_success.html", {"request": request})
+@app.get("/analysis/new", response_class=HTMLResponse)
+def analysis_new_page(request: Request, user: User = Depends(get_current_user)):
+    return templates.TemplateResponse("analysis_new.html", {"request": request})
+
+@app.post("/analysis/new")
+async def analysis_new_submit(
+    request: Request,
+    file: UploadFile = File(...),
+    user: User = Depends(get_current_user)
+):
+    # TODO: zapisz plik, wywołaj analizę
+    return RedirectResponse("/dashboard", status_code=302)
+
+@app.get("/reports", response_class=HTMLResponse)
+def reports_page(request: Request, user: User = Depends(get_current_user)):
+    reports = []  # TODO: pobierz z bazy lub folderu
+    return templates.TemplateResponse(
+        "reports.html",
+        {"request": request, "reports": reports}
+    )
+
+@app.get("/history", response_class=HTMLResponse)
+def history_page(request: Request, user: User = Depends(get_current_user)):
+    logs = []  # TODO: pobierz logi z bazy
+    return templates.TemplateResponse(
+        "history.html",
+        {"request": request, "logs": logs}
+    )
+@app.get("/settings", response_class=HTMLResponse)
+def settings_page(request: Request, user: User = Depends(get_current_user)):
+    return templates.TemplateResponse(
+        "settings.html",
+        {"request": request, "user": user}
+    )
+
+@app.post("/settings", response_class=HTMLResponse)
+def settings_submit(
+    request: Request,
+    name: str = Form(...),
+    password: str = Form(None),
+    user: User = Depends(get_current_user)
+):
+    if password:
+        user.password = hash_password(password)
+    user.name = name
+    with Session(engine) as sess:
+        sess.add(user)
+        sess.commit()
+    return templates.TemplateResponse(
+        "settings.html",
+        {"request": request, "user": user, "success": "Zapisano zmiany."}
+    )
+
+@app.get("/support", response_class=HTMLResponse)
+def support_page(request: Request, user: User = Depends(get_current_user)):
+    return templates.TemplateResponse("support.html", {"request": request})
+
+@app.post("/support", response_class=HTMLResponse)
+def support_submit(
+    request: Request,
+    subject: str = Form(...),
+    message: str = Form(...),
+    user: User = Depends(get_current_user)
+):
+    # TODO: zapisz ticket lub wyślij mail
+    return templates.TemplateResponse(
+        "support.html",
+        {"request": request, "success": "Dziękujemy za zgłoszenie."}
+    )
 
 # --- Google OAuth / Auth0 ---
 @app.get("/auth/login", response_class=HTMLResponse)
