@@ -27,7 +27,7 @@ from functions import (
 )
 from sqlmodel import Session, select, SQLModel, create_engine
 
-app = FastAPI()
+app = FastAPI(debug=True)
 
 # --- Sessions & DB ---
 app.add_middleware(
