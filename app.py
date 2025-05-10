@@ -237,8 +237,7 @@ def forgot_password_page(request: Request):
 
 @app.post("/auth/forgot_password", response_class=HTMLResponse)
 def forgot_password_submit(request: Request, email: str = Form(...)):
-    # (opcjonalnie) sprawdź czy user istnieje w DB
-    send_password_reset_email(email)
+    auth.send_password_reset_email(email)
     return templates.TemplateResponse(
         "forgot_sent.html",
         {"request": request, "email": email}
