@@ -22,7 +22,7 @@ from functions import (
     decrypt_file,
     ocr_image,
     anonymize_image,
-    hash_password
+    hash_password,
     verify_password
 )
 from sqlmodel import Session
