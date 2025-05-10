@@ -159,6 +159,24 @@ def settings_submit(
     password: str = Form(None),
     user: User = Depends(get_current_user)
 ):
+       # Zmiana hasła
+    if password:
+        user.password = hash_password(password)
+    # Upload awatara
+    if avatar:
+        path = f"static/avatars/{user.id}_{avatar.filename}"
+        with open(path, "wb") as f:
+            f.write(await avatar.read())
+        user.avatar_url = f"/{path}"
+    # Imię
+    user.name = name
+    # Zapis w DB
+    with Session(engine) as sess:
+        sess.add(user)
+        sess.commit()
+    return templates.TemplateResponse(
+        "settings.html",
+        {"request": request, "user": user, "success": "Zapisano zmiany."}
     if password:
         user.password = hash_password(password)
     user.name = name
@@ -439,4 +457,32 @@ async def api_anonymize(file: UploadFile = File(...)):
 
     anon_path = anonymize_image(filepath)
     return {"anon_path": anon_path}
+
+@app.post("/settings/2fa", response_class=HTMLResponse)
+def settings_2fa(request: Request,
+                 enable: bool = Form(...),
+                 user: User = Depends(get_current_user)):
+    if enable:
+        # wygeneruj sekret i QR
+        secret = pyotp.random_base32()
+        user.two_factor_secret = secret
+        user.is_2fa_enabled = True
+    else:
+        user.two_factor_secret = None
+        user.is_2fa_enabled = False
+    with Session(engine) as sess:
+        sess.add(user)
+        sess.commit()
+    return RedirectResponse("/settings", 302)
+
+@app.get("/settings/2fa/qr")
+def get_2fa_qr(user: User = Depends(get_current_user)):
+    if not user.two_factor_secret:
+        raise HTTPException(404)
+    otp = pyotp.TOTP(user.two_factor_secret)
+    uri = otp.provisioning_uri(user.email, issuer_name="ConfideAI")
+    img = qrcode.make(uri)
+    buf = io.BytesIO()
+    img.save(buf, format="PNG")
+    return Response(content=buf.getvalue(), media_type="image/png")
     
