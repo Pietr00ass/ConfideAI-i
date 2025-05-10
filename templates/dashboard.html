@@ -20,23 +20,23 @@
 
     <!-- Main Content -->
     <div class="flex-1">
-      <!-- Top Bar inside main for small screens -->
-      <div class="flex items-center justify-between mb-6 lg:hidden">
-        <h1 class="text-2xl font-semibold">Dashboard</h1>
+      <!-- Mobile Header -->
+      <div class="flex flex-col items-center mb-6 lg:hidden text-center">
+        <h1 class="text-2xl font-semibold mb-2">Dashboard</h1>
         <a href="/auth/logout" class="text-red-500 hover:text-red-700">Wyloguj</a>
       </div>
 
       <!-- Stats Cards -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-        <div class="bg-white shadow rounded p-4">
+        <div class="bg-white shadow rounded p-4 text-center">
           <h3 class="text-sm text-gray-500">Przetworzone pliki</h3>
           <p class="text-2xl font-bold">{{ stats.files_processed }}</p>
         </div>
-        <div class="bg-white shadow rounded p-4">
+        <div class="bg-white shadow rounded p-4 text-center">
           <h3 class="text-sm text-gray-500">Wykryte elementy wrażliwe</h3>
           <p class="text-2xl font-bold">{{ stats.sensitive_items }}</p>
         </div>
-        <div class="bg-white shadow rounded p-4">
+        <div class="bg-white shadow rounded p-4 text-center">
           <h3 class="text-sm text-gray-500">Twoje konto</h3>
           <p class="text-2xl font-bold">{{ user.email }}</p>
         </div>
@@ -44,12 +44,12 @@
 
       <!-- Trend Chart -->
       <div class="bg-white shadow rounded p-6 mb-8">
-        <h2 class="text-lg font-medium mb-4">Trend analiz w ostatnich 7 dniach</h2>
+        <h2 class="text-lg font-medium mb-4 text-center">Trend analiz w ostatnich 7 dniach</h2>
         <canvas id="trendChart" class="w-full h-64"></canvas>
       </div>
 
       <!-- Quick Actions -->
-      <div class="flex flex-wrap gap-4 mb-8">
+      <div class="flex flex-wrap gap-4 justify-center mb-8">
         <a href="/analysis/new" class="btn btn-primary">Nowa analiza</a>
         <a href="/encrypt" class="btn btn-secondary">Szyfruj plik</a>
         <a href="/ocr" class="btn btn-secondary">OCR</a>
@@ -57,7 +57,7 @@
 
       <!-- Recent Results -->
       <div>
-        <h2 class="text-xl font-semibold mb-4">Ostatnie wyniki</h2>
+        <h2 class="text-xl font-semibold mb-4 text-center">Ostatnie wyniki</h2>
         {% if results and results|length > 0 %}
           <div class="space-y-4">
             {% for result in results %}
@@ -76,15 +76,12 @@
             {% endfor %}
           </div>
         {% else %}
-          <p class="text-gray-600">Brak wyników do wyświetlenia.</p>
+          <p class="text-gray-600 text-center">Brak wyników do wyświetlenia.</p>
         {% endif %}
       </div>
     </div>
   </div>
 </div>
-
-{% endblock %}
-
 {% block scripts %}
 {{ super() }}
 <script>
