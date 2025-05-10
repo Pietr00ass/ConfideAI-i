@@ -153,41 +153,43 @@ def settings_page(request: Request, user: User = Depends(get_current_user)):
     )
 
 @app.post("/settings", response_class=HTMLResponse)
-def settings_submit(
+async def settings_submit(
     request: Request,
     name: str = Form(...),
-    password: str = Form(None),
+    password: str | None = Form(None),
+    avatar: UploadFile | None = File(None),
     user: User = Depends(get_current_user)
 ):
-       # Zmiana hasła
+    # Zmiana hasła
     if password:
         user.password = hash_password(password)
+
     # Upload awatara
     if avatar:
-        path = f"static/avatars/{user.id}_{avatar.filename}"
+        upload_dir = "static/avatars"
+        os.makedirs(upload_dir, exist_ok=True)
+        filename = f"{user.id}_{avatar.filename}"
+        path = os.path.join(upload_dir, filename)
+        contents = await avatar.read()
         with open(path, "wb") as f:
-            f.write(await avatar.read())
+            f.write(contents)
         user.avatar_url = f"/{path}"
+
     # Imię
     user.name = name
+
     # Zapis w DB
     with Session(engine) as sess:
         sess.add(user)
         sess.commit()
+
     return templates.TemplateResponse(
         "settings.html",
         {"request": request, "user": user, "success": "Zapisano zmiany."}
-    if password:
-        user.password = hash_password(password)
-    user.name = name
-    with Session(engine) as sess:
-        sess.add(user)
-        sess.commit()
-    return templates.TemplateResponse(
+    )(
         "settings.html",
         {"request": request, "user": user, "success": "Zapisano zmiany."}
     )
-
 @app.get("/support", response_class=HTMLResponse)
 def support_page(request: Request, user: User = Depends(get_current_user)):
     return templates.TemplateResponse("support.html", {"request": request})
