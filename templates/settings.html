@@ -14,6 +14,30 @@
       <input type="password" name="password" class="input" />
       <p class="text-xs text-gray-500">Puste, aby nie zmieniać</p>
     </div>
+     <!-- awatar -->
+  <div class="mb-4 text-center">
+    {% if user.avatar_url %}
+      <img src="{{ user.avatar_url }}" class="w-24 h-24 rounded-full mx-auto" />
+    {% endif %}
+    <input type="file" name="avatar" accept="image/*" />
+  </div>
+
+  <!-- 2FA -->
+  <div class="info-block">
+    <h2 class="mb-2">Dwuskładnikowe uwierzytelnianie</h2>
+    {% if user.is_2fa_enabled %}
+      <img src="/settings/2fa/qr" alt="QR code" class="mx-auto mb-2" />
+      <form action="/settings/2fa" method="post">
+        <input type="hidden" name="enable" value="false" />
+        <button class="btn btn-secondary">Wyłącz 2FA</button>
+      </form>
+    {% else %}
+      <form action="/settings/2fa" method="post">
+        <input type="hidden" name="enable" value="true" />
+        <button class="btn btn-primary">Włącz 2FA</button>
+      </form>
+    {% endif %}
+  </div>
     <button type="submit" class="btn btn-primary">Zapisz zmiany</button>
   </form>
 </section>
