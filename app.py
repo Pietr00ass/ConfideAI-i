@@ -23,6 +23,7 @@ from functions import (
     ocr_image,
     anonymize_image,
     hash_password
+    verify_password
 )
 from sqlmodel import Session
 
