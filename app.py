@@ -156,10 +156,11 @@ def settings_page(request: Request, user: User = Depends(get_current_user)):
         {"request": request, "user": user, "success": success, "error": error}
     )
 
+
 @app.post("/settings")
 async def settings_submit(
     request: Request,
-    name: str = Form(...),
+    name: str | None = Form(None),
     password: str | None = Form(None),
     avatar: UploadFile | None = File(None),
     user: User = Depends(get_current_user)
@@ -200,8 +201,9 @@ async def settings_submit(
 
             user.avatar_url = f"/{path}"
 
-        # 3. Imię
-        user.name = name
+        # 3. Imię (opcjonalnie)
+        if name:
+            user.name = name
 
         # 4. Zapis do DB
         with Session(engine) as sess:
@@ -213,6 +215,7 @@ async def settings_submit(
     except Exception as e:
         print(f"[ERROR] settings_submit: {e}")
         return RedirectResponse(url="/settings?error=Blad%20zapisania%20ustawien", status_code=302)
+
 
 
 @app.get("/support", response_class=HTMLResponse)
