@@ -147,12 +147,15 @@ def history_page(request: Request, user: User = Depends(get_current_user)):
     )
 @app.get("/settings", response_class=HTMLResponse)
 def settings_page(request: Request, user: User = Depends(get_current_user)):
+    success = request.query_params.get("success")
     return templates.TemplateResponse(
         "settings.html",
-        {"request": request, "user": user}
+        {"request": request, "user": user, "success": success}
     )
 
-@app.post("/settings", response_class=HTMLResponse)
+from fastapi.responses import RedirectResponse
+
+@app.post("/settings")
 async def settings_submit(
     request: Request,
     name: str = Form(...),
@@ -160,11 +163,11 @@ async def settings_submit(
     avatar: UploadFile | None = File(None),
     user: User = Depends(get_current_user)
 ):
-    # Zmiana hasła
+    # 1) Zmiana hasła
     if password:
         user.password = hash_password(password)
 
-    # Upload awatara
+    # 2) Upload awatara
     if avatar:
         upload_dir = "static/avatars"
         os.makedirs(upload_dir, exist_ok=True)
@@ -175,21 +178,18 @@ async def settings_submit(
             f.write(contents)
         user.avatar_url = f"/{path}"
 
-    # Imię
+    # 3) Zmiana imienia
     user.name = name
 
-    # Zapis w DB
+    # 4) Zapis zmian w bazie
     with Session(engine) as sess:
         sess.add(user)
         sess.commit()
 
-    return templates.TemplateResponse(
-        "settings.html",
-        {"request": request, "user": user, "success": "Zapisano zmiany."}
-    )(
-        "settings.html",
-        {"request": request, "user": user, "success": "Zapisano zmiany."}
-    )
+    # 5) PRG: przekieruj z parametrem success do GET /settings
+    return RedirectResponse(url="/settings?success=1", status_code=302)
+
+    
 @app.get("/support", response_class=HTMLResponse)
 def support_page(request: Request, user: User = Depends(get_current_user)):
     return templates.TemplateResponse("support.html", {"request": request})
