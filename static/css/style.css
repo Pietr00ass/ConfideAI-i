@@ -458,5 +458,14 @@ height: 1rem;
 .btn-primary.processing .progress-text {
   opacity: 1;            /* pokazujemy procent */
 }
+/* Uniwersalny avatar */
+.avatar-img {
+  width: 96px;
+  height: 96px;
+  object-fit: cover;
+  border-radius: 50%;
+  display: block;      /* by margin auto działało */
+  margin: 0 auto 1rem; /* center + dolny odstęp */
+}
 
 
