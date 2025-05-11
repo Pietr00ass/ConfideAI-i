@@ -6,67 +6,111 @@
 <section class="section container mx-auto max-w-lg">
   <h1 class="text-3xl font-bold mb-6 text-center">Ustawienia konta</h1>
 
-  {% if success %}
-    <div class="info-block mb-6">
-      <p class="text-center text-green-400 font-medium">{{ success }}</p>
-    </div>
-  {% endif %}
+  <!-- Toast sukcesu -->
+  <div id="toast-success"
+       class="fixed top-4 right-4 bg-green-600 text-white px-4 py-2 rounded shadow-lg opacity-0 transition-opacity duration-300">
+    Zapisano zmiany!
+  </div>
 
   <!-- 1) Formularz profilu -->
-  <form action="/settings" method="post" enctype="multipart/form-data" class="form-card space-y-6 mb-8">
+  <form action="/settings"
+        method="post"
+        enctype="multipart/form-data"
+        class="form-card space-y-6 mb-8">
 
     <!-- Imię -->
     <div class="form-group">
-      <input type="text" name="name" id="name" value="{{ user.name or '' }}" placeholder=" " required />
+      <input type="text"
+             name="name"
+             id="name"
+             value="{{ user.name or '' }}"
+             placeholder=" "
+             required />
       <label for="name">Imię</label>
     </div>
 
     <!-- Hasło -->
     <div class="form-group">
-      <input type="password" name="password" id="password" placeholder=" " />
+      <input type="password"
+             name="password"
+             id="password"
+             placeholder=" " />
       <label for="password">Nowe hasło</label>
-      <p class="text-xs text-gray-500 mt-1">Pozostaw puste, aby nie zmieniać</p>
+      <p class="text-xs text-gray-500 mt-1">
+        Pozostaw puste, aby nie zmieniać
+      </p>
     </div>
 
     <!-- Awatar -->
     <div class="text-center">
       {% if user.avatar_url %}
-        <img src="{{ user.avatar_url }}" alt="Awatar" class="w-24 h-24 rounded-full mx-auto mb-4" />
+        <img src="{{ user.avatar_url }}"
+             alt="Awatar"
+             class="w-24 h-24 rounded-full mx-auto mb-4" />
       {% endif %}
       <div class="file-group inline-flex items-center">
-        <input type="file" name="avatar" id="avatar" accept="image/*" class="hidden" />
+        <input type="file"
+               name="avatar"
+               id="avatar"
+               accept="image/*"
+               class="hidden" />
         <label for="avatar" class="btn-file">Wybierz awatar</label>
-        <span class="file-name ml-2 text-gray-400" id="avatar-name">Brak pliku</span>
+        <span class="file-name ml-2 text-gray-400" id="avatar-name">
+          Brak pliku
+        </span>
       </div>
     </div>
 
     <!-- Przycisk zapisu zmian -->
     <div class="text-center">
-      <button type="submit" class="btn btn-primary inline-block">Zapisz zmiany</button>
+      <button type="submit" class="btn btn-primary inline-block">
+        Zapisz zmiany
+      </button>
     </div>
   </form>
 
   <!-- 2) Dwuskładnikowe uwierzytelnianie (2FA) -->
-  <div class="info-block y-6 mt-8">
-    <h2 class="text-lg font-semibold mb-4 text-center">Dwuskładnikowe uwierzytelnianie (2FA)</h2>
+  <div class="info-block mb-6 mt-8">
+    <h2 class="text-lg font-semibold mb-4 text-center">
+      Dwuskładnikowe uwierzytelnianie (2FA)
+    </h2>
     {% if user.is_2fa_enabled %}
       <div class="text-center mb-4">
-        <img src="/settings/2fa/qr" alt="QR code" class="mx-auto" />
+        <img src="/settings/2fa/qr"
+             alt="QR code"
+             class="mx-auto" />
       </div>
-      <form action="/settings/2fa" method="post" class="text-center">
+      <form action="/settings/2fa"
+            method="post"
+            class="text-center">
         <input type="hidden" name="enable" value="false" />
-        <button type="submit" class="btn btn-secondary inline-block">Wyłącz 2FA</button>
+        <button type="submit" class="btn btn-secondary inline-block">
+          Wyłącz 2FA
+        </button>
       </form>
     {% else %}
-      <form action="/settings/2fa" method="post" class="text-center">
+      <form action="/settings/2fa"
+            method="post"
+            class="text-center">
         <input type="hidden" name="enable" value="true" />
-        <button type="submit" class="btn btn-primary inline-block">Włącz 2FA</button>
+        <button type="submit" class="btn btn-primary inline-block">
+          Włącz 2FA
+        </button>
       </form>
     {% endif %}
   </div>
 </section>
 
 <script>
+  // Toast sukcesu
+  document.addEventListener('DOMContentLoaded', () => {
+    const toast = document.getElementById('toast-success');
+    if (new URLSearchParams(window.location.search).get('success')) {
+      toast.classList.remove('opacity-0');
+      setTimeout(() => toast.classList.add('opacity-0'), 3000);
+    }
+  });
+
   // Wyświetl nazwę wybranego pliku awatara
   document.getElementById('avatar')?.addEventListener('change', function() {
     document.getElementById('avatar-name').textContent =
