@@ -33,6 +33,8 @@ from functions import (
 from sqlmodel import Session, select, SQLModel, create_engine, func
 from datetime import date, timedelta
 from fastapi import Depends
+from fastapi.responses import RedirectResponse
+
 
 
 app = FastAPI(debug=True)
@@ -148,12 +150,12 @@ def history_page(request: Request, user: User = Depends(get_current_user)):
 @app.get("/settings", response_class=HTMLResponse)
 def settings_page(request: Request, user: User = Depends(get_current_user)):
     success = request.query_params.get("success")
+    error = request.query_params.get("error")
     return templates.TemplateResponse(
         "settings.html",
-        {"request": request, "user": user, "success": success}
+        {"request": request, "user": user, "success": success, "error": error}
     )
 
-from fastapi.responses import RedirectResponse
 
 @app.post("/settings")
 async def settings_submit(
@@ -163,32 +165,55 @@ async def settings_submit(
     avatar: UploadFile | None = File(None),
     user: User = Depends(get_current_user)
 ):
-    # 1) Zmiana hasła
-    if password:
-        user.password = hash_password(password)
+    MAX_AVATAR_SIZE = 2 * 1024 * 1024  # 2 MB
 
-    # 2) Upload awatara
-    if avatar:
-        upload_dir = "static/avatars"
-        os.makedirs(upload_dir, exist_ok=True)
-        filename = f"{user.id}_{avatar.filename}"
-        path = os.path.join(upload_dir, filename)
-        contents = await avatar.read()
-        with open(path, "wb") as f:
-            f.write(contents)
-        user.avatar_url = f"/{path}"
+    try:
+        # 1) Zmiana hasła
+        if password:
+            user.password = hash_password(password)
 
-    # 3) Zmiana imienia
-    user.name = name
+        # 2) Obsługa awatara
+        if avatar:
+            contents = await avatar.read()
+            if len(contents) > MAX_AVATAR_SIZE:
+                return RedirectResponse(url="/settings?error=Plik%20przekracza%202MB", status_code=302)
 
-    # 4) Zapis zmian w bazie
-    with Session(engine) as sess:
-        sess.add(user)
-        sess.commit()
+            # Usuń poprzedni avatar jeśli istniał
+            if user.avatar_url:
+                try:
+                    old_path = user.avatar_url.lstrip("/")
+                    if os.path.exists(old_path):
+                        os.remove(old_path)
+                except Exception as e:
+                    print(f"[WARN] Nie można usunąć starego avatara: {e}")
 
-    # 5) PRG: przekieruj z parametrem success do GET /settings
-    return RedirectResponse(url="/settings?success=1", status_code=302)
+            # Skaluje i zapisuje nowy avatar
+            upload_dir = "static/avatars"
+            os.makedirs(upload_dir, exist_ok=True)
+            filename = f"{user.id}_{avatar.filename}"
+            path = os.path.join(upload_dir, filename)
 
+            with Image.open(io.BytesIO(contents)) as img:
+                img = img.convert("RGB")
+                img = img.resize((96, 96), Image.LANCZOS)
+                img.save(path, format="JPEG", quality=85)
+
+            user.avatar_url = f"/{path}"
+
+        # 3) Zmiana imienia
+        user.name = name
+
+        # 4) Zapis zmian
+        with Session(engine) as sess:
+            sess.add(user)
+            sess.commit()
+
+        # 5) PRG
+        return RedirectResponse(url="/settings?success=1", status_code=302)
+
+    except Exception as e:
+        print(f"[ERROR] settings_submit: {e}")
+        return RedirectResponse(url="/settings?error=Blad%20zapisania%20ustawien", status_code=302)
     
 @app.get("/support", response_class=HTMLResponse)
 def support_page(request: Request, user: User = Depends(get_current_user)):
