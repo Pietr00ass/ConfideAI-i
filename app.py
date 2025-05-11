@@ -156,7 +156,6 @@ def settings_page(request: Request, user: User = Depends(get_current_user)):
         {"request": request, "user": user, "success": success, "error": error}
     )
 
-
 @app.post("/settings")
 async def settings_submit(
     request: Request,
@@ -168,17 +167,17 @@ async def settings_submit(
     MAX_AVATAR_SIZE = 2 * 1024 * 1024  # 2 MB
 
     try:
-        # 1) Zmiana hasła
+        # 1. Hasło
         if password:
             user.password = hash_password(password)
 
-        # 2) Obsługa awatara
-        if avatar:
+        # 2. Awatar
+        if avatar and avatar.filename:
             contents = await avatar.read()
             if len(contents) > MAX_AVATAR_SIZE:
                 return RedirectResponse(url="/settings?error=Plik%20przekracza%202MB", status_code=302)
 
-            # Usuń poprzedni avatar jeśli istniał
+            # Usuń stary awatar
             if user.avatar_url:
                 try:
                     old_path = user.avatar_url.lstrip("/")
@@ -187,12 +186,13 @@ async def settings_submit(
                 except Exception as e:
                     print(f"[WARN] Nie można usunąć starego avatara: {e}")
 
-            # Skaluje i zapisuje nowy avatar
+            # Zapis nowego awatara
             upload_dir = "static/avatars"
             os.makedirs(upload_dir, exist_ok=True)
-            filename = f"{user.id}_{avatar.filename}"
+            filename = f"{user.id}_{avatar.filename}".replace(" ", "_")
             path = os.path.join(upload_dir, filename)
 
+            # Skalowanie do 96x96
             with Image.open(io.BytesIO(contents)) as img:
                 img = img.convert("RGB")
                 img = img.resize((96, 96), Image.LANCZOS)
@@ -200,21 +200,21 @@ async def settings_submit(
 
             user.avatar_url = f"/{path}"
 
-        # 3) Zmiana imienia
+        # 3. Imię
         user.name = name
 
-        # 4) Zapis zmian
+        # 4. Zapis do DB
         with Session(engine) as sess:
             sess.add(user)
             sess.commit()
 
-        # 5) PRG
         return RedirectResponse(url="/settings?success=1", status_code=302)
 
     except Exception as e:
         print(f"[ERROR] settings_submit: {e}")
         return RedirectResponse(url="/settings?error=Blad%20zapisania%20ustawien", status_code=302)
-    
+
+
 @app.get("/support", response_class=HTMLResponse)
 def support_page(request: Request, user: User = Depends(get_current_user)):
     return templates.TemplateResponse("support.html", {"request": request})
