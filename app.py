@@ -4,7 +4,7 @@ from PIL import Image
 import io
 import os
 from fastapi import (
-    FastAPI, Request, UploadFile, File, Form, HTTPException, Depends
+    FastAPI, Request, UploadFile, File, Form, HTTPException, Depends, Response
 )
 from fastapi.responses import (
     HTMLResponse, RedirectResponse, JSONResponse
