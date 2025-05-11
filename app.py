@@ -156,7 +156,6 @@ def settings_page(request: Request, user: User = Depends(get_current_user)):
         {"request": request, "user": user, "success": success, "error": error}
     )
 
-
 @app.post("/settings")
 async def settings_submit(
     request: Request,
@@ -215,8 +214,6 @@ async def settings_submit(
     except Exception as e:
         print(f"[ERROR] settings_submit: {e}")
         return RedirectResponse(url="/settings?error=Blad%20zapisania%20ustawien", status_code=302)
-
-
 
 @app.get("/support", response_class=HTMLResponse)
 def support_page(request: Request, user: User = Depends(get_current_user)):
