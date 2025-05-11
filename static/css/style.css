@@ -458,14 +458,33 @@ height: 1rem;
 .btn-primary.processing .progress-text {
   opacity: 1;            /* pokazujemy procent */
 }
-/* Uniwersalny avatar */
+
+/* Dodatek: Toast sukcesu (np. "Zapisano zmiany") */
+#toast-success {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  background: #16a34a;
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  z-index: 9999;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+  font-weight: 500;
+}
+
+/* Uniwersalny avatar – już był, ale dodajemy pełną skalowalność */
 .avatar-img {
   width: 96px;
   height: 96px;
+  max-width: 100%;
+  max-height: 100%;
   object-fit: cover;
   border-radius: 50%;
-  display: block;      /* by margin auto działało */
-  margin: 0 auto 1rem; /* center + dolny odstęp */
+  display: block;
+  margin: 0 auto 1rem;
 }
 
 
