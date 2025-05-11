@@ -1,5 +1,6 @@
 import pyotp
 import qrcode
+from PIL import Image
 import io
 import os
 from fastapi import (
