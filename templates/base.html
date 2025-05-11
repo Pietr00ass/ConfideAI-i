@@ -4,75 +4,78 @@
   <meta charset="UTF-8">
   <title>{% block title %}ConfideAI{% endblock %}</title>
   {% block head %}
-  <!-- Lottie Player -->
-  <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
-  <!-- AOS -->
-  <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet" />
-  <!-- Podstawowy CSS -->
-  <link rel="stylesheet" href="/static/css/style.css">
-  <!-- Chart.js -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Lottie Player -->
+    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+
+    <!-- AOS Animations -->
+    <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet" />
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/static/css/style.css">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   {% endblock %}
 </head>
-<body>
+<body class="relative text-white overflow-x-hidden">
 
-  <!-- 1) Pełnoekranowy Vanta pod wszystkimi elementami -->
-  <div id="vanta-bg"></div>
+  <!-- Vanta background (z-index: -1) -->
+  <div id="vanta-bg" class="absolute inset-0 -z-10"></div>
 
-  <!-- 2) Loader overlay -->
-  <div id="loader-overlay">
-    <div id="container">
+  <!-- Loader overlay -->
+  <div id="loader-overlay" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-80 z-50">
+    <div id="container" class="text-center">
       <div id="html-spinner"></div>
       <p id="html-para">Ładowanie aplikacji…</p>
     </div>
   </div>
 
-  <!-- 3) Nawigacja -->
+  <!-- Nawigacja -->
   {% include "nav.html" %}
 
-  <!-- 4) Główna zawartość -->
-  <main>
+  <!-- Główna zawartość -->
+  <main class="relative z-10 pt-6 px-4">
     {% block content %}{% endblock %}
   </main>
 
-  <!-- 5) Stopka -->
-  <footer>
-    <p>© 2025 ConfideAI — Wszystkie prawa zastrzeżone.</p>
+  <!-- Stopka -->
+  <footer class="text-center text-sm text-gray-400 py-6 mt-10">
+    © 2025 ConfideAI — Wszystkie prawa zastrzeżone.
   </footer>
 
   {% block scripts %}
-  <!-- Skrypty zewnętrzne -->
-  <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/rellax@1.12.1/rellax.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.net.min.js"></script>
+    <!-- AOS, Rellax, Vanta -->
+    <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/rellax@1.12.1/rellax.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.net.min.js"></script>
 
-  <script>
-    // Ukryj loader po załadowaniu
-    window.addEventListener('load', () => {
-      const overlay = document.getElementById('loader-overlay');
-      overlay.style.transition = 'opacity 0.5s ease';
-      overlay.style.opacity = '0';
-      setTimeout(() => overlay.remove(), 500);
-    });
+    <script>
+      // Ukryj loader po załadowaniu
+      window.addEventListener('load', () => {
+        const overlay = document.getElementById('loader-overlay');
+        overlay.style.transition = 'opacity 0.5s ease';
+        overlay.style.opacity = '0';
+        setTimeout(() => overlay.remove(), 500);
+      });
 
-    // Inicjalizacja AOS
-    AOS.init({ duration: 800, once: true });
+      // Inicjalizacja AOS
+      AOS.init({ duration: 800, once: true });
 
-    // Parallax dla elementów z klasą .rellax
-    new Rellax('.rellax', { speed: -2 });
+      // Parallax
+      new Rellax('.rellax', { speed: -2 });
 
-    // Inicjalizacja Vanta.NET na cały ekran
-    VANTA.NET({
-      el: "#vanta-bg",
-      color: 0x444444,
-      backgroundColor: 0x000000,
-      points: 25.00,
-      maxDistance: 25.00,
-      spacing: 20.00,
-      showDots: false
-    });
-  </script>
+      // Tło VANTA.NET
+      VANTA.NET({
+        el: "#vanta-bg",
+        color: 0x444444,
+        backgroundColor: 0x000000,
+        points: 25.00,
+        maxDistance: 25.00,
+        spacing: 20.00,
+        showDots: false
+      });
+    </script>
   {% endblock %}
 </body>
 </html>
