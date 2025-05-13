@@ -507,113 +507,70 @@ height: 1rem;
 /* biały tekst */
 .text-white { color: #fff !important; }
 
-/* ----------------------------------------------
-   LOGIN PAGE STYLES
-   ---------------------------------------------- */
+/* --------------------------------------------------
+   Login page tweaks
+   -------------------------------------------------- */
+/* margin-top: 2.5rem; */
+.mt-10 { margin-top: 2.5rem !important; }
 
-/* Cały kontener strony logowania */
-.login-section {
-  padding: 4rem 1rem;
+/* wrapper wokół Google button */
+.login-google-wrapper {
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+  max-width: 360px;   /* dopasuj do swojej szerokości */
+  margin-left: auto;
+  margin-right: auto;
 }
 
-/* Panel logowania */
-.login-card {
-  max-width: 400px;
-  margin: 0 auto;
-  background: rgba(26,26,26,0.85);
-  padding: 2rem;
-  border-radius: 16px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.6);
-}
-
-/* Nagłówek */
-.login-title {
-  font-size: 2rem;
-  font-weight: 700;
-  color: #fff;
-  text-align: center;
+/* floating-label dla login page — etykiety na górze pola */
+.login-form .form-group {
+  position: relative;
   margin-bottom: 1.5rem;
 }
-
-/* Błąd logowania */
-.login-error {
-  background: #7f1d1d;
-  color: #fee2e2;
-  padding: 0.75rem 1rem;
-  border-radius: 8px;
-  margin-bottom: 1rem;
-  text-align: center;
-}
-
-/* Formularz wewnątrz panelu */
-.login-form .form-group {
-  margin-bottom: 1.25rem;
-}
-
-/* Float‐label inputs – biały background i wyższe paddingi góry */
 .login-form .form-group input {
-  background-color: #eef4ff;
-  border: 1px solid #ccc;
-  color: #333;
-  padding: 1.25rem 1rem 0.75rem;
+  padding-top: 1.25rem; /* więcej miejsca na etykietę */
 }
 .login-form .form-group label {
   position: absolute;
-  top: 1rem;
+  top: 0.25rem;
   left: 1rem;
-  font-size: 0.875rem;
-  color: #666;
-  background: #eef4ff;
+  font-size: 0.75rem;
+  color: #777;
+  background: rgba(255,255,255,0.9);
   padding: 0 0.25rem;
   pointer-events: none;
-  transition: all 0.2s;
-}
-.login-form .form-group input:focus + label,
-.login-form .form-group input:not(:placeholder-shown) + label {
-  top: -0.5rem;
-  left: 0.75rem;
-  font-size: 0.75rem;
-  color: var(--grad-end);
+  /* usuń transformy */
+  transform: none !important;
 }
 
-/* Główny przycisk „Zaloguj się” */
-.login-btn {
-  width: 100%;
-  padding: 0.75rem;
-  font-size: 1rem;
-}
-
-/* Separator usuwamy (już niepotrzebny) */
-/* .login-separator { ... } */
-
-/* Przycisk Google (mniejszy, wyrównany) */
+/* przycisk Google */
 .google-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 2.5rem;
-  width: auto;
-  max-width: 240px;
-  margin: 2.5rem auto 1rem auto;
+  gap: 0.5rem;
+  width: 100%;
   padding: 0.75rem;
   font-size: 1rem;
+  border-radius: 999px;
+  background: linear-gradient(45deg, var(--grad-start), var(--grad-end));
+  box-shadow: 0 0 8px var(--glow);
+  transition: transform .2s, box-shadow .2s;
+  color: #fff;
+  text-decoration: none;
+}
+.google-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 16px var(--glow);
 }
 
-/* Ikona Google */
-.google-icon {
-  width: 20px;
-  height: 20px;
-}
-
-/* Linki pod spodem */
+/* wyrównanie stopki linków pod panelem */
 .login-footer {
-  text-align: center;
   margin-top: 1.5rem;
+  text-align: center;
 }
 .login-footer p {
-  margin: 0.25rem 0;
-  color: #aaa;
-  font-size: 0.875rem;
+  margin: 0.5rem 0;
 }
 .login-footer a {
   color: #4f46e5;
