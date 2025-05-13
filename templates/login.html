@@ -3,47 +3,66 @@
 
 {% block content %}
 <section class="section">
-  <div class="container max-w-md mx-auto">
-
+  <div class="container mx-auto max-w-md px-4">
     <h1 class="text-3xl font-bold mb-6 text-white text-center">Zaloguj się</h1>
 
     {% if error %}
-      <div class="login-error mb-4">{{ error }}</div>
+      <div class="info-block mb-4 text-red-400">
+        {{ error }}
+      </div>
     {% endif %}
 
-    <form action="/auth/login"
-          method="post"
-          class="login-form form-card mb-6"
-          data-aos="fade-up">
-
-      <!-- Adres e-mail -->
-      <div class="form-group">
-        <input
-          type="email"
-          name="email"
-          id="email"
-          value="{{ email or '' }}"
-          placeholder=" "
-          required
-        />
-        <label for="email">Adres e-mail</label>
-      </div>
-
-      <!-- Hasło -->
-      <div class="form-group">
-        <input
-          type="password"
-          name="password"
-          id="password"
-          placeholder=" "
-          required
-        />
-        <label for="password">Hasło</label>
-      </div>
+    <form action="/auth/login" method="post" class="form-card space-y-6" data-aos="fade-up">
+      {% if not require_2fa %}
+        <!-- Krok 1: email + hasło -->
+        <div class="form-group">
+          <input type="email"
+                 name="email"
+                 id="email"
+                 value="{{ email or '' }}"
+                 placeholder=" "
+                 required />
+          <label for="email">Adres e-mail</label>
+        </div>
+        <div class="form-group">
+          <input type="password"
+                 name="password"
+                 id="password"
+                 placeholder=" "
+                 required />
+          <label for="password">Hasło</label>
+        </div>
+      {% else %}
+        <!-- Krok 2: readonly email/hasło + TOTP, z etykietami nad polami -->
+        <div class="mb-4">
+          <label class="block mb-1 text-sm text-gray-400">Adres e-mail</label>
+          <input type="email"
+                 name="email"
+                 value="{{ email }}"
+                 readonly
+                 class="w-full px-4 py-2 rounded bg-gray-700 text-white cursor-not-allowed" />
+        </div>
+        <div class="mb-4">
+          <label class="block mb-1 text-sm text-gray-400">Hasło</label>
+          <input type="password"
+                 name="password"
+                 value="••••••••"
+                 readonly
+                 class="w-full px-4 py-2 rounded bg-gray-700 text-white cursor-not-allowed" />
+        </div>
+        <div class="form-group">
+          <input type="text"
+                 name="totp_code"
+                 id="totp_code"
+                 placeholder=" "
+                 required />
+          <label for="totp_code">Kod 2FA</label>
+        </div>
+      {% endif %}
 
       <button type="submit"
-              class="login-btn btn btn-primary">
-        Zaloguj się
+              class="btn btn-primary w-full">
+        {% if require_2fa %}Zweryfikuj 2FA{% else %}Zaloguj się{% endif %}
       </button>
     </form>
 
