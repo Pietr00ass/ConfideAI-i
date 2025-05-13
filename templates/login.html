@@ -7,12 +7,15 @@
     <h1 class="text-3xl font-bold mb-6 text-white text-center">Zaloguj się</h1>
 
     {% if error %}
-      <div class="info-block mb-4 text-red-400">
-        {{ error }}
-      </div>
+      <div class="info-block mb-4 text-red-400">{{ error }}</div>
     {% endif %}
 
-    <form action="/auth/login" method="post" class="form-card space-y-6" data-aos="fade-up">
+    <form action="/auth/login"
+          method="post"
+          class="form-card space-y-6"
+          id="login-form"
+          data-aos="fade-up">
+
       {% if not require_2fa %}
         <!-- Krok 1: email + hasło -->
         <div class="form-group">
@@ -33,30 +36,21 @@
           <label for="password">Hasło</label>
         </div>
       {% else %}
-        <!-- Krok 2: readonly email/hasło + TOTP, z etykietami nad polami -->
-        <div class="mb-4">
-          <label class="block mb-1 text-sm text-gray-400">Adres e-mail</label>
-          <input type="email"
-                 name="email"
-                 value="{{ email }}"
-                 readonly
-                 class="w-full px-4 py-2 rounded bg-gray-700 text-white cursor-not-allowed" />
-        </div>
-        <div class="mb-4">
-          <label class="block mb-1 text-sm text-gray-400">Hasło</label>
-          <input type="password"
-                 name="password"
-                 value="••••••••"
-                 readonly
-                 class="w-full px-4 py-2 rounded bg-gray-700 text-white cursor-not-allowed" />
-        </div>
-        <div class="form-group">
-          <input type="text"
-                 name="totp_code"
-                 id="totp_code"
-                 placeholder=" "
-                 required />
-          <label for="totp_code">Kod 2FA</label>
+        <!-- Krok 2: tylko PIN 2FA w 6 polach -->
+        <input type="hidden" name="totp_code" id="totp_code">
+        <div class="mb-4 text-center">
+          <p class="text-gray-400 mb-2">Wpisz kod 2FA</p>
+          <div class="flex justify-center space-x-2">
+            {% for i in range(6) %}
+              <input id="digit-{{i}}"
+                     type="text"
+                     inputmode="numeric"
+                     pattern="[0-9]*"
+                     maxlength="1"
+                     class="otp-input"
+                     data-index="{{ i }}" />
+            {% endfor %}
+          </div>
         </div>
       {% endif %}
 
@@ -68,9 +62,9 @@
 
     <!-- Google OAuth -->
     {% if google_login_url %}
-      <div class="login-google-wrapper">
+      <div class="login-google-wrapper mt-8">
         <a href="{{ google_login_url }}"
-           class="google-btn">
+           class="google-btn inline-flex items-center justify-center gap-2 mx-auto max-w-sm w-full">
           <img src="/static/img/google-icon.svg"
                alt="Google"
                class="google-icon" />
@@ -80,17 +74,58 @@
     {% endif %}
 
     <!-- Stopka -->
-    <div class="login-footer">
+    <div class="login-footer mt-6 text-center text-sm text-gray-400">
       <p>
         Nie pamiętasz hasła?
-        <a href="/auth/forgot_password">Przypomnij hasło</a>
+        <a href="/auth/forgot_password" class="text-blue-400 hover:underline">
+          Przypomnij hasło
+        </a>
       </p>
-      <p>
+      <p class="mt-2">
         Nie masz konta?
-        <a href="/auth/register">Zarejestruj się</a>
+        <a href="/auth/register" class="text-blue-400 hover:underline">
+          Zarejestruj się
+        </a>
       </p>
     </div>
-
   </div>
 </section>
+
+<script>
+  {% if require_2fa %}
+  // 1) Auto-focus i przejście na kolejne pole
+  document.querySelectorAll('.otp-input').forEach(input => {
+    input.addEventListener('input', (e) => {
+      const idx = +e.target.dataset.index;
+      if (e.target.value && idx < 5) {
+        document.getElementById(`digit-${idx+1}`).focus();
+      }
+      updateHiddenTotp();
+    });
+    input.addEventListener('keydown', (e) => {
+      const idx = +e.target.dataset.index;
+      if (e.key === 'Backspace' && !e.target.value && idx > 0) {
+        document.getElementById(`digit-${idx-1}`).focus();
+      }
+    });
+  });
+
+  // 2) Łączenie sześciu pól w ukryte totp_code
+  function updateHiddenTotp(){
+    const code = Array.from({length:6}, (_,i) =>
+      document.getElementById(`digit-${i}`).value || ''
+    ).join('');
+    document.getElementById('totp_code').value = code;
+  }
+
+  // 3) Przy submicie upewnij się, że totp_code ma 6 cyfr
+  document.getElementById('login-form').addEventListener('submit', (e) => {
+    const code = document.getElementById('totp_code').value;
+    if (code.length < 6) {
+      e.preventDefault();
+      alert('Podaj pełny, 6-cyfrowy kod 2FA.');
+    }
+  });
+  {% endif %}
+</script>
 {% endblock %}
