@@ -3,87 +3,69 @@
 
 {% block content %}
 <section class="section">
-  <div class="container mx-auto max-w-md px-4">
+  <div class="container max-w-md mx-auto py-8">
+
     <h1 class="text-3xl font-bold mb-6 text-white text-center">Zaloguj się</h1>
 
     {% if error %}
-      <div class="info-block mb-4 text-red-400">
-        {{ error }}
-      </div>
+      <div class="info-block mb-4 text-red-400">{{ error }}</div>
     {% endif %}
 
-    <form action="/auth/login" method="post" class="form-card space-y-6" data-aos="fade-up">
-      {% if not require_2fa %}
-        <!-- Krok 1: email + hasło -->
-        <div class="form-group">
-          <input type="email"
-                 name="email"
-                 id="email"
-                 value="{{ email or '' }}"
-                 placeholder=" "
-                 required />
-          <label for="email">Adres e-mail</label>
-        </div>
-        <div class="form-group">
-          <input type="password"
-                 name="password"
-                 id="password"
-                 placeholder=" "
-                 required />
-          <label for="password">Hasło</label>
-        </div>
-      {% else %}
-        <!-- Krok 2: readonly email/hasło + TOTP, z etykietami nad polami -->
-        <div class="mb-4">
-          <label class="block mb-1 text-sm text-gray-400">Adres e-mail</label>
-          <input type="email"
-                 name="email"
-                 value="{{ email }}"
-                 readonly
-                 class="w-full px-4 py-2 rounded bg-gray-700 text-white cursor-not-allowed" />
-        </div>
-        <div class="mb-4">
-          <label class="block mb-1 text-sm text-gray-400">Hasło</label>
-          <input type="password"
-                 name="password"
-                 value="••••••••"
-                 readonly
-                 class="w-full px-4 py-2 rounded bg-gray-700 text-white cursor-not-allowed" />
-        </div>
-        <div class="form-group">
-          <input type="text"
-                 name="totp_code"
-                 id="totp_code"
-                 placeholder=" "
-                 required />
-          <label for="totp_code">Kod 2FA</label>
-        </div>
-      {% endif %}
+    <form action="/auth/login"
+          method="post"
+          class="form-card space-y-6">
 
+      <!-- Adres e-mail -->
+      <div class="form-group">
+        <input type="email"
+               name="email"
+               id="email"
+               value="{{ email or '' }}"
+               placeholder=" "
+               required />
+        <label for="email">Adres e-mail</label>
+      </div>
+
+      <!-- Hasło -->
+      <div class="form-group">
+        <input type="password"
+               name="password"
+               id="password"
+               placeholder=" "
+               required />
+        <label for="password">Hasło</label>
+      </div>
+
+      <!-- Submit -->
       <button type="submit"
               class="btn btn-primary w-full">
-        {% if require_2fa %}Zweryfikuj 2FA{% else %}Zaloguj się{% endif %}
+        Zaloguj się
       </button>
     </form>
 
-    <!-- Google OAuth -->
     {% if google_login_url %}
-      <div class="mt-6 mb-4 text-center">
-        <a href="{{ google_login_url }}"
-           class="btn btn-secondary inline-flex items-center justify-center gap-2 max-w-sm mx-auto">
-          <img src="/static/img/google-icon.svg" alt="Google" class="w-5 h-5" />
-          Zaloguj przez Google
-        </a>
-      </div>
+    <!-- Google OAuth -->
+    <a href="{{ google_login_url }}"
+       class="btn btn-secondary inline-flex items-center justify-center gap-2 mt-6 mx-auto max-w-xs w-full">
+      <img src="/static/img/google-icon.svg"
+           alt="Google"
+           class="w-5 h-5" />
+      Zaloguj przez Google
+    </a>
     {% endif %}
 
-    <p class="text-sm text-gray-400 text-center mb-2">
-      Nie pamiętasz hasła? 
-      <a href="/auth/forgot_password" class="text-blue-400 hover:underline">Przypomnij hasło</a>
+    <!-- Linki pomocnicze -->
+    <p class="text-center text-sm text-gray-400 mt-6">
+      Nie pamiętasz hasła?
+      <a href="/auth/forgot_password" class="text-blue-400 hover:underline">
+        Przypomnij hasło
+      </a>
     </p>
-    <p class="text-sm text-gray-400 text-center">
-      Nie masz konta? 
-      <a href="/auth/register" class="text-blue-400 hover:underline">Zarejestruj się</a>
+    <p class="text-center text-sm text-gray-400 mt-2">
+      Nie masz konta?
+      <a href="/auth/register" class="text-blue-400 hover:underline">
+        Zarejestruj się
+      </a>
     </p>
   </div>
 </section>
