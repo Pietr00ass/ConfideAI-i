@@ -8,68 +8,69 @@
     <h1 class="text-3xl font-bold mb-6 text-white text-center">Zaloguj się</h1>
 
     {% if error %}
-      <div class="info-block mb-4 text-red-400">{{ error }}</div>
+      <div class="login-error mb-4">{{ error }}</div>
     {% endif %}
 
     <form action="/auth/login"
           method="post"
-          class="form-card space-y-6 mb-6"
+          class="login-form form-card mb-6"
           data-aos="fade-up">
 
+      <!-- Adres e-mail -->
       <div class="form-group">
-        <input type="email"
-               name="email"
-               id="email"
-               value="{{ email or '' }}"
-               placeholder=" "
-               required />
+        <input
+          type="email"
+          name="email"
+          id="email"
+          value="{{ email or '' }}"
+          placeholder=" "
+          required
+        />
         <label for="email">Adres e-mail</label>
       </div>
 
+      <!-- Hasło -->
       <div class="form-group">
-        <input type="password"
-               name="password"
-               id="password"
-               placeholder=" "
-               required />
+        <input
+          type="password"
+          name="password"
+          id="password"
+          placeholder=" "
+          required
+        />
         <label for="password">Hasło</label>
       </div>
 
-      <!-- Gdy już jest 2FA wymagane, możesz rozgałęzić podobnie jak wcześniej -->
-
       <button type="submit"
-              class="btn btn-primary w-full">
+              class="login-btn btn btn-primary">
         Zaloguj się
       </button>
     </form>
 
-   <!-- Google OAuth -->
-{% if google_login_url %}
-  <div class="text-center">
-    <a
-      href="{{ google_login_url }}"
-      class="btn btn-secondary
-             inline-flex items-center justify-center gap-2
-             mx-auto
-             mt-10 mb-10
-             max-w-sm
-             w-auto">
-      <img src="/static/img/google-icon.svg" alt="Google" class="w-5 h-5" />
-      Zaloguj przez Google
-    </a>
-  </div>
-{% endif %}
+    <!-- Google OAuth -->
+    {% if google_login_url %}
+      <div class="login-google-wrapper">
+        <a href="{{ google_login_url }}"
+           class="google-btn">
+          <img src="/static/img/google-icon.svg"
+               alt="Google"
+               class="google-icon" />
+          Zaloguj przez Google
+        </a>
+      </div>
+    {% endif %}
 
-    <p class="text-center text-sm text-gray-400 mb-1">
-      Nie pamiętasz hasła?
-      <a href="/auth/forgot_password"
-         class="text-blue-400 hover:underline">Przypomnij hasło</a>
-    </p>
-    <p class="text-center text-sm text-gray-400">
-      Nie masz konta?
-      <a href="/auth/register"
-         class="text-blue-400 hover:underline">Zarejestruj się</a>
-    </p>
+    <!-- Stopka -->
+    <div class="login-footer">
+      <p>
+        Nie pamiętasz hasła?
+        <a href="/auth/forgot_password">Przypomnij hasło</a>
+      </p>
+      <p>
+        Nie masz konta?
+        <a href="/auth/register">Zarejestruj się</a>
+      </p>
+    </div>
 
   </div>
 </section>
