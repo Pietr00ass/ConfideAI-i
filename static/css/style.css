@@ -579,3 +579,41 @@ height: 1rem;
 .login-footer a:hover {
   text-decoration: underline;
 }
+
+/* ===== OTP (2FA) inputs ===== */
+
+/* Kontener na pola OTP – flex w jednej linii, równo wyśrodkowany */
+.otp-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.75rem; /* odstęp między polami */
+  margin-top: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+/* Pojedyncze pole OTP */
+.otp-input {
+  width: 3.5rem;
+  height: 3.5rem;
+  background: rgba(26,26,26,0.85);
+  color: #fff;
+  font-size: 1.5rem;
+  font-weight: 600;
+  text-align: center;
+  border: 2px solid rgba(255,255,255,0.15);
+  border-radius: 0.75rem;
+  transition: border-color 0.2s, background 0.2s;
+  outline: none;
+}
+
+/* Hover i focus – gradientowy border, lekki glow */
+.otp-input:hover {
+  background: rgba(26,26,26,0.95);
+}
+
+.otp-input:focus {
+  border-color: var(--grad-end);
+  box-shadow: 0 0 8px var(--glow);
+  background: rgba(31,31,31,0.95);
+}
