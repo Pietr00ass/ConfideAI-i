@@ -507,4 +507,86 @@ height: 1rem;
 /* biały tekst */
 .text-white { color: #fff !important; }
 
+/* ----------------------------------------------
+   Login page tweaks
+   ---------------------------------------------- */
+.login-section {
+  padding: 4rem 1rem;
+}
+
+.login-card {
+  max-width: 400px;
+  margin: 0 auto;
+  background: rgba(26,26,26,0.85);
+  padding: 2rem;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+}
+
+.login-title {
+  text-align: center;
+  color: #fff;
+  margin-bottom: 1.5rem;
+  font-size: 2rem;
+}
+
+.login-error {
+  background: #7f1d1d;
+  color: #fee2e2;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.login-form .form-group {
+  margin-bottom: 1.25rem;
+}
+
+.login-btn {
+  width: 100%;
+  padding: 0.75rem;
+  font-size: 1rem;
+}
+
+.login-separator {
+  display: flex;
+  align-items: center;
+  margin: 1.5rem 0;
+  color: #aaa;
+}
+.login-separator span {
+  margin: 0 0.75rem;
+}
+
+.google-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.75rem;
+  font-size: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.google-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.login-footer {
+  text-align: center;
+}
+.login-footer p {
+  margin: 0.25rem 0;
+}
+.login-footer a {
+  color: #4f46e5;
+  text-decoration: none;
+}
+.login-footer a:hover {
+  text-decoration: underline;
+}
+
 
