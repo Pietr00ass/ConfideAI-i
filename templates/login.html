@@ -43,18 +43,22 @@
       </button>
     </form>
 
-    <!-- Google OAuth -->
-    {% if google_login_url %}
-    <div class="text-center mb-6">
-      <a href="{{ google_login_url }}"
-         class="btn btn-secondary mx-auto inline-flex items-center justify-center gap-2 max-w-sm w-full">
-        <img src="/static/img/google-icon.svg"
-             alt="Google"
-             class="w-5 h-5" />
-        Zaloguj przez Google
-      </a>
-    </div>
-    {% endif %}
+   <!-- Google OAuth -->
+{% if google_login_url %}
+  <div class="text-center">
+    <a
+      href="{{ google_login_url }}"
+      class="btn btn-secondary
+             inline-flex items-center justify-center gap-2
+             mx-auto
+             mt-6 mb-4
+             max-w-sm
+             w-auto">
+      <img src="/static/img/google-icon.svg" alt="Google" class="w-5 h-5" />
+      Zaloguj przez Google
+    </a>
+  </div>
+{% endif %}
 
     <p class="text-center text-sm text-gray-400 mb-1">
       Nie pamiętasz hasła?
