@@ -508,12 +508,15 @@ height: 1rem;
 .text-white { color: #fff !important; }
 
 /* ----------------------------------------------
-   Login page tweaks
+   LOGIN PAGE STYLES
    ---------------------------------------------- */
+
+/* Cały kontener strony logowania */
 .login-section {
   padding: 4rem 1rem;
 }
 
+/* Panel logowania */
 .login-card {
   max-width: 400px;
   margin: 0 auto;
@@ -523,13 +526,16 @@ height: 1rem;
   box-shadow: 0 8px 32px rgba(0,0,0,0.6);
 }
 
+/* Nagłówek */
 .login-title {
-  text-align: center;
-  color: #fff;
-  margin-bottom: 1.5rem;
   font-size: 2rem;
+  font-weight: 700;
+  color: #fff;
+  text-align: center;
+  margin-bottom: 1.5rem;
 }
 
+/* Błąd logowania */
 .login-error {
   background: #7f1d1d;
   color: #fee2e2;
@@ -539,47 +545,75 @@ height: 1rem;
   text-align: center;
 }
 
+/* Formularz wewnątrz panelu */
 .login-form .form-group {
   margin-bottom: 1.25rem;
 }
 
+/* Float‐label inputs – biały background i wyższe paddingi góry */
+.login-form .form-group input {
+  background-color: #eef4ff;
+  border: 1px solid #ccc;
+  color: #333;
+  padding: 1.25rem 1rem 0.75rem;
+}
+.login-form .form-group label {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  font-size: 0.875rem;
+  color: #666;
+  background: #eef4ff;
+  padding: 0 0.25rem;
+  pointer-events: none;
+  transition: all 0.2s;
+}
+.login-form .form-group input:focus + label,
+.login-form .form-group input:not(:placeholder-shown) + label {
+  top: -0.5rem;
+  left: 0.75rem;
+  font-size: 0.75rem;
+  color: var(--grad-end);
+}
+
+/* Główny przycisk „Zaloguj się” */
 .login-btn {
   width: 100%;
   padding: 0.75rem;
   font-size: 1rem;
 }
 
-.login-separator {
-  display: flex;
-  align-items: center;
-  margin: 1.5rem 0;
-  color: #aaa;
-}
-.login-separator span {
-  margin: 0 0.75rem;
-}
+/* Separator usuwamy (już niepotrzebny) */
+/* .login-separator { ... } */
 
+/* Przycisk Google (mniejszy, wyrównany) */
 .google-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
   width: 100%;
+  max-width: 240px;
+  margin: 1.5rem auto 0 auto;
   padding: 0.75rem;
   font-size: 1rem;
-  margin-bottom: 1.5rem;
 }
 
+/* Ikona Google */
 .google-icon {
   width: 20px;
   height: 20px;
 }
 
+/* Linki pod spodem */
 .login-footer {
   text-align: center;
+  margin-top: 1.5rem;
 }
 .login-footer p {
   margin: 0.25rem 0;
+  color: #aaa;
+  font-size: 0.875rem;
 }
 .login-footer a {
   color: #4f46e5;
@@ -588,5 +622,3 @@ height: 1rem;
 .login-footer a:hover {
   text-decoration: underline;
 }
-
-
