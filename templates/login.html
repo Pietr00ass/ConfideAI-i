@@ -2,63 +2,94 @@
 {% block title %}Logowanie – ConfideAI{% endblock %}
 
 {% block content %}
-<section class="section container mx-auto max-w-md">
-  <h1 class="text-3xl font-bold mb-6 text-center">Zaloguj się</h1>
+<section class="section">
+  <div class="container text-center max-w-md mx-auto">
+    <h1 class="text-3xl font-bold mb-6 text-white">Zaloguj się</h1>
 
-  {% if error %}
-    <div class="alert alert-danger mb-4">{{ error }}</div>
-  {% endif %}
-
-  <form action="/auth/login" method="post" class="form-card space-y-6" data-aos="fade-up">
-    <!-- E-mail -->
-    <div class="form-group">
-      <input type="email"
-             name="email"
-             id="email"
-             placeholder=" "
-             value="{{ email or '' }}"
-             required />
-      <label for="email">Adres e-mail</label>
-    </div>
-
-    <!-- Hasło -->
-    <div class="form-group">
-      <input type="password"
-             name="password"
-             id="password"
-             placeholder=" "
-             required />
-      <label for="password">Hasło</label>
-    </div>
-
-    {# jeśli require_2fa=True, pokaż pole na kod #}
-    {% if require_2fa %}
-      <div class="form-group">
-        <input type="text"
-               name="totp_code"
-               id="totp_code"
-               placeholder=" "
-               pattern="\d{6}"
-               title="6-cyfrowy kod"
-               required />
-        <label for="totp_code">Kod 2FA</label>
+    {% if error %}
+      <div class="info-block mb-4 text-red-400">
+        {{ error }}
       </div>
     {% endif %}
 
-    <button type="submit" class="btn btn-primary w-full py-3">Zaloguj się</button>
-  </form>
+    <form action="/auth/login" method="post" class="form-card space-y-6" data-aos="fade-up">
+      <!-- E-mail (tylko w pierwszym kroku) -->
+      {% if not require_2fa %}
+        <div class="form-group">
+          <input type="email"
+                 name="email"
+                 id="email"
+                 value="{{ email }}"
+                 placeholder=" "
+                 required />
+          <label for="email">Adres e-mail</label>
+        </div>
+        <div class="form-group">
+          <input type="password"
+                 name="password"
+                 id="password"
+                 placeholder=" "
+                 required />
+          <label for="password">Hasło</label>
+        </div>
+      {% else %}
+        <!-- Ładujemy email jako readonly -->
+        <div class="form-group">
+          <input type="email"
+                 name="email"
+                 value="{{ email }}"
+                 readonly
+                 class="bg-gray-700 cursor-not-allowed" />
+          <label class="text-gray-400">Adres e-mail</label>
+        </div>
+        <div class="form-group">
+          <input type="password"
+                 name="password"
+                 value="********"
+                 readonly
+                 class="bg-gray-700 cursor-not-allowed" />
+          <label class="text-gray-400">Hasło</label>
+        </div>
+        <!-- Pole TOTP -->
+        <div class="form-group">
+          <input type="text"
+                 name="totp_code"
+                 id="totp_code"
+                 placeholder=" "
+                 required />
+          <label for="totp_code">Kod 2FA</label>
+        </div>
+      {% endif %}
 
-  <div class="mt-6 text-center space-y-2">
-    <p>
-      <a href="/auth/forgot_password" class="text-sm text-gray-400 hover:text-gray-200">
-        Nie pamiętasz hasła?
-      </a>
+      <button type="submit"
+              class="btn btn-primary w-full">
+        {% if require_2fa %}Zweryfikuj 2FA{% else %}Zaloguj się{% endif %}
+      </button>
+    </form>
+
+    <!-- separator -->
+    <div class="flex items-center my-4 text-gray-500">
+      <hr class="flex-1 border-gray-600" />
+      <span class="px-2">lub</span>
+      <hr class="flex-1 border-gray-600" />
+    </div>
+
+    <!-- Google OAuth -->
+    {% if google_login_url %}
+      <div class="text-center mb-6">
+        <a href="{{ google_login_url }}"
+           class="btn btn-secondary w-full inline-flex items-center justify-center gap-2">
+          <img src="/static/img/google-icon.svg" alt="Google" class="w-5 h-5" />
+          Zaloguj przez Google
+        </a>
+      </div>
+    {% endif %}
+
+    <p class="text-sm text-gray-400">
+      Nie pamiętasz hasła? <a href="/auth/forgot_password" class="text-blue-400 hover:underline">Przypomnij hasło</a>
     </p>
-    <p>
-      Nie masz konta?
-      <a href="/auth/register" class="text-sm text-gradient hover:underline">
-        Zarejestruj się
-      </a>
+    <p class="text-sm text-gray-400">
+      Nie masz konta? <a href="/auth/register" class="text-blue-400 hover:underline">Zarejestruj się</a>
     </p>
   </div>
 </section>
