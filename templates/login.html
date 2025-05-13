@@ -2,28 +2,63 @@
 {% block title %}Logowanie – ConfideAI{% endblock %}
 
 {% block content %}
-<section class="section">
-  <div class="container text-center">
-    <h1>Zaloguj się</h1>
-    {% if error %}
-      <div class="alert alert-danger">{{ error }}</div>
+<section class="section container mx-auto max-w-md">
+  <h1 class="text-3xl font-bold mb-6 text-center">Zaloguj się</h1>
+
+  {% if error %}
+    <div class="alert alert-danger mb-4">{{ error }}</div>
+  {% endif %}
+
+  <form action="/auth/login" method="post" class="form-card space-y-6" data-aos="fade-up">
+    <!-- E-mail -->
+    <div class="form-group">
+      <input type="email"
+             name="email"
+             id="email"
+             placeholder=" "
+             value="{{ email or '' }}"
+             required />
+      <label for="email">Adres e-mail</label>
+    </div>
+
+    <!-- Hasło -->
+    <div class="form-group">
+      <input type="password"
+             name="password"
+             id="password"
+             placeholder=" "
+             required />
+      <label for="password">Hasło</label>
+    </div>
+
+    {# jeśli require_2fa=True, pokaż pole na kod #}
+    {% if require_2fa %}
+      <div class="form-group">
+        <input type="text"
+               name="totp_code"
+               id="totp_code"
+               placeholder=" "
+               pattern="\d{6}"
+               title="6-cyfrowy kod"
+               required />
+        <label for="totp_code">Kod 2FA</label>
+      </div>
     {% endif %}
-    <form action="/auth/login" method="post" class="form-card" data-aos="fade-up">
-      <div class="form-group">
-        <input type="email" name="email" id="email" placeholder=" " required>
-        <label for="email">Adres e-mail</label>
-      </div>
-      <div class="form-group">
-        <input type="password" name="password" id="password" placeholder=" " required>
-        <label for="password">Hasło</label>
-      </div>
-      <button type="submit" class="btn-primary">Zaloguj się</button>
-    </form>
-    <p class="mt-8">
-      Nie pamiętasz hasła? <a href="/auth/forgot_password">Przypomnij Hasło</a>
+
+    <button type="submit" class="btn btn-primary w-full py-3">Zaloguj się</button>
+  </form>
+
+  <div class="mt-6 text-center space-y-2">
+    <p>
+      <a href="/auth/forgot_password" class="text-sm text-gray-400 hover:text-gray-200">
+        Nie pamiętasz hasła?
+      </a>
     </p>
-    <p class="mt-8">
-      Nie masz konta? <a href="/auth/register">Zarejestruj się</a>
+    <p>
+      Nie masz konta?
+      <a href="/auth/register" class="text-sm text-gradient hover:underline">
+        Zarejestruj się
+      </a>
     </p>
   </div>
 </section>
