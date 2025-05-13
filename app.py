@@ -233,29 +233,135 @@ def support_submit(
         {"request": request, "success": "Dziękujemy za zgłoszenie."}
     )
 
-# --- Google OAuth / Auth0 ---
+# helper do 2FA
+def verify_totp(user: User, code: str) -> bool:
+    totp = pyotp.TOTP(user.two_factor_secret)
+    return totp.verify(code)
+
+# 1) Strona logowania (GET)
 @app.get("/auth/login", response_class=HTMLResponse)
 def login_page(request: Request):
-    return templates.TemplateResponse("login.html", {"request": request})
+    # przygotuj Google-OAuth link
+    google_url, state = get_authorization_url()
+    request.session["oauth_state"] = state
 
+    return templates.TemplateResponse(
+        "login.html",
+        {
+            "request": request,
+            "error": None,
+            "email": "",
+            "require_2fa": False,
+            "google_login_url": google_url
+        }
+    )
+
+
+# 2) Obsługa POST logowania
 @app.post("/auth/login", response_class=HTMLResponse)
-def login_submit(request: Request,
-                 email: str = Form(...),
-                 password: str = Form(...)):
+def login_submit(
+    request: Request,
+    email:      str      = Form(...),
+    password:   str      = Form(...),
+    totp_code:  str | None = Form(None)
+):
+    # Jeżeli dostaliśmy już kod TOTP → finalny krok 2FA
+    if totp_code is not None:
+        user_id = request.session.get("pre_2fa_user")
+        if not user_id:
+            return RedirectResponse("/auth/login", status_code=302)
+        with Session(engine) as sess:
+            user = sess.get(User, user_id)
+        if not user or not user.two_factor_secret:
+            return RedirectResponse("/auth/login", status_code=302)
+        if not verify_totp(user, totp_code):
+            return templates.TemplateResponse(
+                "login.html",
+                {
+                    "request": request,
+                    "error": "Nieprawidłowy kod 2FA.",
+                    "email": email,
+                    "require_2fa": True,
+                    "google_login_url": None
+                }
+            )
+        # 2FA przeszło pomyślnie → zaloguj
+        request.session.clear()
+        request.session["user_id"] = user.id
+        return RedirectResponse("/dashboard", status_code=302)
+
+
+    # Pierwszy krok: e-mail + hasło
     with Session(engine) as sess:
         statement = select(User).where(User.email == email)
         user = sess.exec(statement).one_or_none()
+
     if not user or not verify_password(password, user.password):
         return templates.TemplateResponse(
             "login.html",
-            {"request": request, "error": "Nieprawidłowy e-mail lub hasło."}
+            {
+                "request": request,
+                "error": "Nieprawidłowy e-mail lub hasło.",
+                "email": email,
+                "require_2fa": False,
+                "google_login_url": None
+            }
         )
+
     if not user.is_active:
         return templates.TemplateResponse(
             "login.html",
-            {"request": request, "error": "Konto nieaktywne. Potwierdź e-mail."}
+            {
+                "request": request,
+                "error": "Konto nieaktywne. Potwierdź e-mail.",
+                "email": email,
+                "require_2fa": False,
+                "google_login_url": None
+            }
         )
-    # ustawiamy sesję
+
+    # Masz włączone 2FA? → pokaż formularz na kod
+    if user.is_2fa_enabled:
+        # przechowaj tymczasowo user_id, aż kod zostanie zweryfikowany
+        request.session["pre_2fa_user"] = user.id
+        return templates.TemplateResponse(
+            "login.html",
+            {
+                "request": request,
+                "error": None,
+                "email": email,
+                "require_2fa": True,
+                "google_login_url": None
+            }
+        )
+
+    # Brak 2FA → normalne zalogowanie
+    request.session.clear()
+    request.session["user_id"] = user.id
+    return RedirectResponse("/dashboard", status_code=302)
+
+
+# 3) Callback z Google OAuth2
+@app.get("/auth/callback")
+def auth_callback(request: Request, code: str = None, state: str = None):
+    if not code or state != request.session.get("oauth_state"):
+        raise HTTPException(400, "Invalid OAuth callback")
+    info = fetch_user_info(code, state)
+    email = info.get("email")
+    if not email:
+        raise HTTPException(400, "No email from provider")
+
+    # znajdź lub stwórz użytkownika
+    with Session(engine) as sess:
+        stmt = select(User).where(User.email == email)
+        user = sess.exec(stmt).one_or_none()
+        if not user:
+            user = User(email=email, name=info.get("name"), is_active=True)
+            sess.add(user)
+            sess.commit()
+            sess.refresh(user)
+
+    request.session.clear()
     request.session["user_id"] = user.id
     return RedirectResponse("/dashboard", status_code=302)
 
