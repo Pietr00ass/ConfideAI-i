@@ -580,32 +580,36 @@ height: 1rem;
   text-decoration: underline;
 }
 
-/* ===== OTP (2FA) inputs ===== */
-
-/* Kontener na pola OTP – flex w jednej linii, równo wyśrodkowany */
+/* ==== One-row OTP inputs ==== */
 .otp-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 0.75rem; /* odstęp między polami */
-  margin-top: 1rem;
-  margin-bottom: 1.5rem;
+  display: flex;             /* ułóż w rząd */
+  justify-content: center;   /* wyśrodkuj */
+  gap: 0.75rem;              /* odstępy między polami */
+  flex-wrap: nowrap;         /* zabroń zawijania */
+  margin-bottom: 1rem;       /* trochę przestrzeni pod spodem */
 }
 
-/* Pojedyncze pole OTP */
 .otp-input {
-  width: 3.5rem;
-  height: 3.5rem;
-  background: rgba(26,26,26,0.85);
-  color: #fff;
-  font-size: 1.5rem;
-  font-weight: 600;
-  text-align: center;
-  border: 2px solid rgba(255,255,255,0.15);
-  border-radius: 0.75rem;
-  transition: border-color 0.2s, background 0.2s;
+  width: 3rem;               /* stała szerokość */
+  height: 3rem;              /* stała wysokość */
+  line-height: 3rem;         /* wyśrodkowanie tekstu wertykalnie */
+  text-align: center;        /* wyśrodkuj cyfrę poziomo */
+  font-size: 1.25rem;        /* czytelny rozmiar czcionki */
+  background: rgba(26,26,26,0.85); /* taki jak form-group */
+  color: #eee;               /* jasny tekst */
   outline: none;
+  border: 2px solid var(--grad-start);
+  box-shadow: 0 0 0 3px var(--glow);
+  border-radius: 8px;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
+
+.otp-input:focus {
+  outline: none;
+  border: 2px solid var(--grad-start);
+  box-shadow: 0 0 0 3px var(--glow);
+}
+
 
 /* Hover i focus – gradientowy border, lekki glow */
 .otp-input:hover {
