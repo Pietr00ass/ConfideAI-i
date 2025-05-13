@@ -33,22 +33,22 @@
           <label for="password">Hasło</label>
         </div>
       {% else %}
-        <!-- Krok 2: readonly email/hasło + TOTP -->
-        <div class="form-group">
+        <!-- Krok 2: readonly email/hasło + TOTP, z etykietami nad polami -->
+        <div class="mb-4">
+          <label class="block mb-1 text-sm text-gray-400">Adres e-mail</label>
           <input type="email"
                  name="email"
                  value="{{ email }}"
                  readonly
-                 class="bg-gray-700 cursor-not-allowed" />
-          <label class="text-gray-400">Adres e-mail</label>
+                 class="w-full px-4 py-2 rounded bg-gray-700 text-white cursor-not-allowed" />
         </div>
-        <div class="form-group">
+        <div class="mb-4">
+          <label class="block mb-1 text-sm text-gray-400">Hasło</label>
           <input type="password"
                  name="password"
                  value="••••••••"
                  readonly
-                 class="bg-gray-700 cursor-not-allowed" />
-          <label class="text-gray-400">Hasło</label>
+                 class="w-full px-4 py-2 rounded bg-gray-700 text-white cursor-not-allowed" />
         </div>
         <div class="form-group">
           <input type="text"
@@ -66,35 +66,24 @@
       </button>
     </form>
 
-    <!-- separator -->
-    <div class="flex items-center my-4 text-gray-500">
-      <hr class="flex-1 border-gray-600" />
-      <span class="px-2">lub</span>
-      <hr class="flex-1 border-gray-600" />
-    </div>
-
     <!-- Google OAuth -->
     {% if google_login_url %}
-      <div class="text-center mb-6">
+      <div class="mt-6 mb-4 text-center">
         <a href="{{ google_login_url }}"
-           class="btn btn-secondary w-full inline-flex items-center justify-center gap-2">
+           class="btn btn-secondary inline-flex items-center justify-center gap-2 max-w-sm mx-auto">
           <img src="/static/img/google-icon.svg" alt="Google" class="w-5 h-5" />
           Zaloguj przez Google
         </a>
       </div>
     {% endif %}
 
-    <p class="text-sm text-gray-400 text-center">
+    <p class="text-sm text-gray-400 text-center mb-2">
       Nie pamiętasz hasła? 
-      <a href="/auth/forgot_password" class="text-blue-400 hover:underline">
-        Przypomnij hasło
-      </a>
+      <a href="/auth/forgot_password" class="text-blue-400 hover:underline">Przypomnij hasło</a>
     </p>
-    <p class="text-sm text-gray-400 text-center mt-2">
+    <p class="text-sm text-gray-400 text-center">
       Nie masz konta? 
-      <a href="/auth/register" class="text-blue-400 hover:underline">
-        Zarejestruj się
-      </a>
+      <a href="/auth/register" class="text-blue-400 hover:underline">Zarejestruj się</a>
     </p>
   </div>
 </section>
