@@ -3,8 +3,8 @@
 
 {% block content %}
 <section class="section">
-  <div class="container text-center max-w-md mx-auto">
-    <h1 class="text-3xl font-bold mb-6 text-white">Zaloguj się</h1>
+  <div class="container mx-auto max-w-md px-4">
+    <h1 class="text-3xl font-bold mb-6 text-white text-center">Zaloguj się</h1>
 
     {% if error %}
       <div class="info-block mb-4 text-red-400">
@@ -13,13 +13,13 @@
     {% endif %}
 
     <form action="/auth/login" method="post" class="form-card space-y-6" data-aos="fade-up">
-      <!-- E-mail (tylko w pierwszym kroku) -->
       {% if not require_2fa %}
+        <!-- Krok 1: email + hasło -->
         <div class="form-group">
           <input type="email"
                  name="email"
                  id="email"
-                 value="{{ email }}"
+                 value="{{ email or '' }}"
                  placeholder=" "
                  required />
           <label for="email">Adres e-mail</label>
@@ -33,7 +33,7 @@
           <label for="password">Hasło</label>
         </div>
       {% else %}
-        <!-- Ładujemy email jako readonly -->
+        <!-- Krok 2: readonly email/hasło + TOTP -->
         <div class="form-group">
           <input type="email"
                  name="email"
@@ -45,12 +45,11 @@
         <div class="form-group">
           <input type="password"
                  name="password"
-                 value="********"
+                 value="••••••••"
                  readonly
                  class="bg-gray-700 cursor-not-allowed" />
           <label class="text-gray-400">Hasło</label>
         </div>
-        <!-- Pole TOTP -->
         <div class="form-group">
           <input type="text"
                  name="totp_code"
@@ -85,11 +84,17 @@
       </div>
     {% endif %}
 
-    <p class="text-sm text-gray-400">
-      Nie pamiętasz hasła? <a href="/auth/forgot_password" class="text-blue-400 hover:underline">Przypomnij hasło</a>
+    <p class="text-sm text-gray-400 text-center">
+      Nie pamiętasz hasła? 
+      <a href="/auth/forgot_password" class="text-blue-400 hover:underline">
+        Przypomnij hasło
+      </a>
     </p>
-    <p class="text-sm text-gray-400">
-      Nie masz konta? <a href="/auth/register" class="text-blue-400 hover:underline">Zarejestruj się</a>
+    <p class="text-sm text-gray-400 text-center mt-2">
+      Nie masz konta? 
+      <a href="/auth/register" class="text-blue-400 hover:underline">
+        Zarejestruj się
+      </a>
     </p>
   </div>
 </section>
