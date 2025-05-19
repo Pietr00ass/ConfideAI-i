@@ -38,6 +38,8 @@ from fastapi.responses import RedirectResponse
 from fastapi.exception_handlers import http_exception_handler as fastapi_http_exception_handler
 from urllib.parse import quote
 from functions import summarize_analysis
+from sqlalchemy.exc import IntegrityError
+
 
 
 
@@ -103,20 +105,29 @@ def technology(request: Request):
 
 @app.get("/auth/register", response_class=HTMLResponse)
 def register_page(request: Request):
-    return templates.TemplateResponse("register.html", {"request": request})
+    return templates.TemplateResponse("register.html", {"request": request, "error": None})
 
 @app.post("/auth/register", response_class=HTMLResponse)
 def register_submit(request: Request,
                     email: str = Form(...),
                     password: str = Form(...)):
-    # haszujemy
     hashed = hash_password(password)
-    # zapis do DB
     with Session(engine) as sess:
         user = User(email=email, password=hashed, is_active=False)
         sess.add(user)
-        sess.commit()
-    # wysyłamy mail
+        try:
+            sess.commit()
+        except IntegrityError:
+            sess.rollback()
+            # jeśli już istnieje taki e-mail, pokaż formularz z komunikatem
+            return templates.TemplateResponse(
+                "register.html",
+                {
+                    "request": request,
+                    "error": "Ten adres e-mail jest już zarejestrowany."
+                }
+            )
+    # jeśli dodanie się powiodło — wyślij mail weryfikacyjny
     send_verification_email(email)
     return templates.TemplateResponse(
         "register_sent.html",
