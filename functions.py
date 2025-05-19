@@ -75,8 +75,8 @@ def summarize_analysis(emails: list[str], pesels: list[str], credit_cards: list[
     parts.append(f"💳 Znalazłem {len(credit_cards)} kart kredytowych.")
     if ml_preds:
         parts.append(f"🤖 ML dokonało {len(ml_preds)} predykcji.")
-    return "\n".join(parts)
-    )
+       return "\n".join(parts)
+    
     resp = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
         messages=[{"role":"user","content":prompt}],
