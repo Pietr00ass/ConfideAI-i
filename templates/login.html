@@ -4,85 +4,103 @@
 {% block content %}
 <section class="section">
   <div class="container mx-auto max-w-md px-4">
+
+    <!-- Nagłówek -->
     <h1 class="text-3xl font-bold mb-6 text-white text-center">Zaloguj się</h1>
 
+    <!-- Błąd -->
     {% if error %}
       <div class="info-block mb-4 text-red-400">{{ error }}</div>
     {% endif %}
 
-    <form action="/auth/login"
-          method="post"
-          class="form-card space-y-6"
-          id="login-form"
-          data-aos="fade-up">
+    <!-- Formularz logowania / 2FA -->
+    <form
+      action="/auth/login"
+      method="post"
+      id="login-form"
+      class="form-card space-y-6 mb-8"
+      data-aos="fade-up"
+    >
 
       {% if not require_2fa %}
-        <!-- Krok 1: email + hasło -->
+        <!-- ==== KROK 1: EMAIL + HASŁO ==== -->
         <div class="form-group">
-          <input type="email"
-                 name="email"
-                 id="email"
-                 value="{{ email or '' }}"
-                 placeholder=" "
-                 required />
+          <input
+            type="email"
+            name="email"
+            id="email"
+            value="{{ email or '' }}"
+            placeholder=" "
+            required
+          />
           <label for="email">Adres e-mail</label>
         </div>
+
         <div class="form-group">
-          <input type="password"
-                 name="password"
-                 id="password"
-                 placeholder=" "
-                 required />
+          <input
+            type="password"
+            name="password"
+            id="password"
+            placeholder=" "
+            required
+          />
           <label for="password">Hasło</label>
         </div>
-      {% else %}
-        <!-- Krok 2: tylko PIN 2FA w 6 polach -->
-        <input type="hidden" name="totp_code" id="totp_code">
-          <div class="mb-4 text-center">
-            <p class="text-gray-400 mb-2">Wpisz kod 2FA</p>
-        <div class="otp-container">
-          {% for i in range(6) %}
-            <input id="digit-{{i}}"
-                   type="text"
-                   inputmode="numeric"
-                   pattern="[0-9]*"
-                   maxlength="1"
-                   class="otp-input"
-                   data-index="{{ i }}" />
-    {% endfor %}
-  </div>
-</div>
 
+      {% else %}
+        <!-- ==== KROK 2: TYLKO 2FA ==== -->
+        <input type="hidden" name="totp_code" id="totp_code">
+        <p class="text-gray-400 text-center mb-4">Wpisz kod 2FA</p>
+        <div class="otp-container flex justify-center gap-3 mb-4">
+          {% for i in range(6) %}
+            <input
+              id="digit-{{ i }}"
+              type="text"
+              inputmode="numeric"
+              pattern="[0-9]*"
+              maxlength="1"
+              class="otp-input w-12 h-12 text-center bg-gray-100 rounded-lg shadow"
+              data-index="{{ i }}"
+            />
+          {% endfor %}
+        </div>
       {% endif %}
 
-      <button type="submit"
-              class="btn btn-primary w-full">
+      <!-- Przycisk główny -->
+      <button
+        type="submit"
+        class="btn btn-primary w-full py-3"
+      >
         {% if require_2fa %}Zweryfikuj 2FA{% else %}Zaloguj się{% endif %}
       </button>
     </form>
 
-    <!-- Google OAuth -->
+    <!-- Przycisk Google OAuth -->
     {% if google_login_url %}
-      <div class="login-google-wrapper mt-8">
-        <a href="{{ google_login_url }}"
-           class="google-btn inline-flex items-center justify-center gap-2 mx-auto max-w-sm w-full">
-          <img src="/static/img/google-icon.svg"
-               alt="Google"
-               class="google-icon" />
+      <div class="text-center mb-6">
+        <a
+          href="{{ google_login_url }}"
+          class="google-btn inline-flex items-center justify-center gap-2 mx-auto max-w-xs w-full py-3"
+        >
+          <img
+            src="/static/img/google-icon.svg"
+            alt="Google"
+            class="w-5 h-5"
+          />
           Zaloguj przez Google
         </a>
       </div>
     {% endif %}
 
     <!-- Stopka -->
-    <div class="login-footer mt-6 text-center text-sm text-gray-400">
+    <div class="login-footer text-center text-sm text-gray-400 space-y-2">
       <p>
         Nie pamiętasz hasła?
         <a href="/auth/forgot_password" class="text-blue-400 hover:underline">
           Przypomnij hasło
         </a>
       </p>
-      <p class="mt-2">
+      <p>
         Nie masz konta?
         <a href="/auth/register" class="text-blue-400 hover:underline">
           Zarejestruj się
@@ -92,18 +110,18 @@
   </div>
 </section>
 
+{% if require_2fa %}
 <script>
-  {% if require_2fa %}
-  // 1) Auto-focus i przejście na kolejne pole
+  // focus + auto-przechodzenie
   document.querySelectorAll('.otp-input').forEach(input => {
-    input.addEventListener('input', (e) => {
+    input.addEventListener('input', e => {
       const idx = +e.target.dataset.index;
       if (e.target.value && idx < 5) {
         document.getElementById(`digit-${idx+1}`).focus();
       }
       updateHiddenTotp();
     });
-    input.addEventListener('keydown', (e) => {
+    input.addEventListener('keydown', e => {
       const idx = +e.target.dataset.index;
       if (e.key === 'Backspace' && !e.target.value && idx > 0) {
         document.getElementById(`digit-${idx-1}`).focus();
@@ -111,22 +129,21 @@
     });
   });
 
-  // 2) Łączenie sześciu pól w ukryte totp_code
-  function updateHiddenTotp(){
+  function updateHiddenTotp() {
     const code = Array.from({length:6}, (_,i) =>
       document.getElementById(`digit-${i}`).value || ''
     ).join('');
     document.getElementById('totp_code').value = code;
   }
 
-  // 3) Przy submicie upewnij się, że totp_code ma 6 cyfr
-  document.getElementById('login-form').addEventListener('submit', (e) => {
+  // walidacja przed wysłaniem
+  document.getElementById('login-form').addEventListener('submit', e => {
     const code = document.getElementById('totp_code').value;
     if (code.length < 6) {
       e.preventDefault();
-      alert('Podaj pełny, 6-cyfrowy kod 2FA.');
+      alert('Podaj 6-cyfrowy kod 2FA.');
     }
   });
-  {% endif %}
 </script>
+{% endif %}
 {% endblock %}
