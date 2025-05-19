@@ -566,6 +566,7 @@ height: 1rem;
 
 /* wyrównanie stopki linków pod panelem */
 .login-footer {
+  width: 100%;
   margin-top: 1.5rem;
   text-align: center;
 }
