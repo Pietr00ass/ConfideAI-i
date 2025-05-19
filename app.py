@@ -238,15 +238,10 @@ def verify_totp(user: User, code: str) -> bool:
     totp = pyotp.TOTP(user.two_factor_secret)
     return totp.verify(code)
 
-# helper 2FA
-def verify_totp(user: User, code: str) -> bool:
-    totp = pyotp.TOTP(user.two_factor_secret)
-    return totp.verify(code)
-
-# 1) GET /auth/login – wyświetlenie formularza
+# 1) Strona logowania (GET)
 @app.get("/auth/login", response_class=HTMLResponse)
 def login_page(request: Request):
-    # przygotuj link do Google OAuth
+    # przygotuj Google-OAuth link
     google_url, state = get_authorization_url()
     request.session["oauth_state"] = state
 
@@ -261,19 +256,20 @@ def login_page(request: Request):
         }
     )
 
-# 2) POST /auth/login – obsługa email+hasło oraz 2FA
+
+# 2) Obsługa POST logowania
 @app.post("/auth/login", response_class=HTMLResponse)
 def login_submit(
     request: Request,
-    email:     str         = Form(...),
-    password:  str         = Form(...),
-    totp_code: str | None  = Form(None)
+    email: str | None     = Form(None),
+    password: str | None  = Form(None),
+    totp_code: str | None = Form(None)
 ):
-    # jeśli dostajemy już totp_code → krok 2FA
+    # --- jeśli dostaliśmy już kod 2FA ---
     if totp_code is not None:
         user_id = request.session.get("pre_2fa_user")
         if not user_id:
-            return RedirectResponse("/auth/login", 302)
+            return RedirectResponse("/auth/login", status_code=302)
         with Session(engine) as sess:
             user = sess.get(User, user_id)
         if not user or not user.two_factor_secret or not verify_totp(user, totp_code):
@@ -281,19 +277,32 @@ def login_submit(
                 "login.html",
                 {
                     "request": request,
-                    "error": "Nieprawidłowy kod 2FA",
-                    "email": email,
+                    "error": "Nieprawidłowy kod 2FA.",
+                    "email": email or "",
                     "require_2fa": True,
                     "google_login_url": None
                 }
             )
-        # kod poprawny → finalize
-        request.session.pop("pre_2fa_user", None)
+        # pomyślna weryfikacja 2FA
         request.session.clear()
         request.session["user_id"] = user.id
-        return RedirectResponse("/dashboard", 302)
+        return RedirectResponse("/dashboard", status_code=302)
 
-    # krok 1: email + hasło
+    # --- pierwszy krok: email + password ---
+    # walidacja obecności obu pól
+    if not email or not password:
+        return templates.TemplateResponse(
+            "login.html",
+            {
+                "request": request,
+                "error": "Podaj e-mail i hasło.",
+                "email": email or "",
+                "require_2fa": False,
+                "google_login_url": None
+            }
+        )
+
+    # sprawdź usera i hasło
     with Session(engine) as sess:
         statement = select(User).where(User.email == email)
         user = sess.exec(statement).one_or_none()
@@ -321,9 +330,8 @@ def login_submit(
             }
         )
 
-    # jeśli 2FA włączone → przejdź do drugiego kroku
+    # jeśli włączone 2FA — przejdź do kroku drugiego
     if user.is_2fa_enabled:
-        request.session.clear()
         request.session["pre_2fa_user"] = user.id
         return templates.TemplateResponse(
             "login.html",
@@ -336,10 +344,10 @@ def login_submit(
             }
         )
 
-    # bez 2FA → normalne logowanie
+    # bez 2FA — normalne zalogowanie
     request.session.clear()
     request.session["user_id"] = user.id
-    return RedirectResponse("/dashboard", 302)
+    return RedirectResponse("/dashboard", status_code=302)
 
 
 # 3) Callback z Google OAuth2
