@@ -37,6 +37,8 @@ from fastapi import Depends
 from fastapi.responses import RedirectResponse
 from fastapi.exception_handlers import http_exception_handler as fastapi_http_exception_handler
 from urllib.parse import quote
+from functions import summarize_analysis
+
 
 
 
@@ -511,7 +513,21 @@ def dashboard(request: Request,
         },
         "results": results_list
     })
+summary = summarize_analysis(result.emails, result.pesel_numbers, result.credit_cards, result.ml_predictions)
 
+# teraz tworzysz i zapisujesz w bazie:
+with Session(engine) as sess:
+    ar = AnalysisResult(
+        user_id=user.id,
+        filename=file.filename,
+        emails=result.emails,
+        pesel_numbers=result.pesel_numbers,
+        credit_cards=result.credit_cards,
+        ml_predictions=result.ml_predictions,
+        summary=summary
+    )
+    sess.add(ar)
+    sess.commit()
 # --- HTML Forms (render) ---
 @app.get("/encrypt", response_class=HTMLResponse)
 def encrypt_form(request: Request):
