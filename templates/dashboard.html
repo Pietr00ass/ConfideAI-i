@@ -71,6 +71,8 @@
                   <li><strong>PESEL:</strong> {{ result.pesel_numbers | join(', ') or 'Brak' }}</li>
                   <li><strong>Karty:</strong> {{ result.credit_cards | join(', ') or 'Brak' }}</li>
                   <li><strong>Predykcje ML:</strong> {{ result.ml_predictions or 'Brak' }}</li>
+                  <li><strong>Podsumowanie:</strong> {{ result.summary or 'Brak' }}</li>
+
                 </ul>
               </div>
             {% endfor %}
