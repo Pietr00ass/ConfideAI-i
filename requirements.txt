@@ -17,3 +17,4 @@ passlib[bcrypt]
 pyotp
 qrcode[pil]
 Pillow
+openai
