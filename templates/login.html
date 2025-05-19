@@ -73,22 +73,21 @@
         </a>
       </div>
     {% endif %}
-
-   <!-- Stopka -->
-<div class="login-footer mt-6 flex flex-col items-center text-sm text-gray-400 space-y-1">
-  <p>
-    Nie pamiętasz hasła?
-    <a href="/auth/forgot_password" class="text-blue-400 hover:underline">
-      Przypomnij hasło
-    </a>
-  </p>
-  <p>
-    Nie masz konta?
-    <a href="/auth/register" class="text-blue-400 hover:underline">
-      Zarejestruj się
-    </a>
-  </p>
-</div>
+  <!-- NOWA STOPKA: flex, items-center, space-y -->
+    <div class="mt-6 flex flex-col items-center space-y-2">
+      <p class="text-sm text-gray-400">
+        Nie pamiętasz hasła?
+        <a href="/auth/forgot_password" class="text-blue-400 hover:underline">
+          Przypomnij hasło
+        </a>
+      </p>
+      <p class="text-sm text-gray-400">
+        Nie masz konta?
+        <a href="/auth/register" class="text-blue-400 hover:underline">
+          Zarejestruj się
+        </a>
+      </p>
+    </div>
 </section>
 
 <script>
