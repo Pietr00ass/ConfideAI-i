@@ -64,17 +64,18 @@ def hash_password(password: str) -> str:
     """Zwraca zhashowane hasło."""
     return pwd_context.hash(password)
 
-def summarize_analysis(emails: list[str], pesels: list[str], cards: list[str], ml: str) -> str:
+def summarize_analysis(emails: list[str], pesels: list[str], credit_cards: list[str], ml_preds: dict) -> str:
     """
-    Wysyła prompt do OpenAI i zwraca krótkie podsumowanie.
+    Proste podsumowanie: policzy, ile czego znalazło i zwróci kilka linijek tekstu.
+    Później możesz tu wstawić wywołanie do GPT lub innej AI.
     """
-    prompt = (
-        "Podsumuj w trzech zdaniach wyniki analizy dokumentu:\n"
-        f"- E-maile: {emails or 'Brak'}\n"
-        f"- PESEL: {pesels or 'Brak'}\n"
-        f"- Karty płatnicze: {cards or 'Brak'}\n"
-        f"- Inne predykcje ML: {ml or 'Brak'}\n\n"
-        "Podsumowanie:"
+    parts = []
+    parts.append(f"🔍 Znalazłem {len(emails)} e-maili.")
+    parts.append(f"🆔 Znalazłem {len(pesels)} numerów PESEL.")
+    parts.append(f"💳 Znalazłem {len(credit_cards)} kart kredytowych.")
+    if ml_preds:
+        parts.append(f"🤖 ML dokonało {len(ml_preds)} predykcji.")
+    return "\n".join(parts)
     )
     resp = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
