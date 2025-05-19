@@ -145,7 +145,39 @@ async def analysis_new_submit(
     file: UploadFile = File(...),
     user: User = Depends(get_current_user)
 ):
-    # TODO: zapisz plik, wywołaj analizę
+    # 1) Zapis pliku na dysku
+    upload_dir = "uploads"
+    os.makedirs(upload_dir, exist_ok=True)
+    filepath = os.path.join(upload_dir, file.filename)
+    contents = await file.read()
+    with open(filepath, "wb") as f:
+        f.write(contents)
+
+    # 2) Wywołaj OCR i parsowanie danych
+    text = ocr_image(filepath)
+    emails = extract_emails(text)
+    pesels = extract_pesels(text)
+    credit_cards = extract_credit_cards(text)
+    ml_predictions = run_ml_model(filepath)
+
+    # 3) Podsumowanie przez AI
+    summary = summarize_analysis(emails, pesels, credit_cards, ml_predictions)
+
+    # 4) Zapis wyniku do bazy
+    with Session(engine) as sess:
+        ar = AnalysisResult(
+            user_id=user.id,
+            filename=file.filename,
+            emails=emails,
+            pesel_numbers=pesels,
+            credit_cards=credit_cards,
+            ml_predictions=ml_predictions,
+            summary=summary
+        )
+        sess.add(ar)
+        sess.commit()
+
+    # 5) PRG → dashboard
     return RedirectResponse("/dashboard", status_code=302)
 
 @app.get("/reports", response_class=HTMLResponse)
@@ -513,21 +545,7 @@ def dashboard(request: Request,
         },
         "results": results_list
     })
-summary = summarize_analysis(result.emails, result.pesel_numbers, result.credit_cards, result.ml_predictions)
 
-# teraz tworzysz i zapisujesz w bazie:
-with Session(engine) as sess:
-    ar = AnalysisResult(
-        user_id=user.id,
-        filename=file.filename,
-        emails=result.emails,
-        pesel_numbers=result.pesel_numbers,
-        credit_cards=result.credit_cards,
-        ml_predictions=result.ml_predictions,
-        summary=summary
-    )
-    sess.add(ar)
-    sess.commit()
 # --- HTML Forms (render) ---
 @app.get("/encrypt", response_class=HTMLResponse)
 def encrypt_form(request: Request):
