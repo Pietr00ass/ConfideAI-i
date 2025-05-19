@@ -23,4 +23,6 @@ class AnalysisResult(SQLModel, table=True):
     pesel_numbers: List[str] = Field(default_factory=list, sa_column=Column(JSON, nullable=False))
     credit_cards: List[str] = Field(default_factory=list, sa_column=Column(JSON, nullable=False))
     ml_predictions: Optional[str] = None
+    summary: str | None = Field(default=None)
+
 
