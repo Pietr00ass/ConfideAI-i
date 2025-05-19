@@ -1,7 +1,7 @@
 from typing import Optional, List, Dict, Any
 from datetime import datetime
 from sqlmodel import SQLModel, Field, Relationship
-from sqlalchemy import Column, JSON
+from sqlalchemy import Column, JSON, ForeignKey
 
 class User(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
@@ -14,8 +14,9 @@ class User(SQLModel, table=True):
     is_2fa_enabled: bool = Field(default=False)
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
-    # Relacja do wyników analiz
+    # relacja zwrotna do wyników analiz
     results: List["AnalysisResult"] = Relationship(back_populates="user")
+
 
 class AnalysisResult(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
@@ -23,16 +24,28 @@ class AnalysisResult(SQLModel, table=True):
     filename: str
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
-    # Przechowujemy listy wrażliwych danych w kolumnie JSON
-    emails: List[str] = Field(default_factory=list, sa_column=Column(JSON, nullable=False))
-    pesel_numbers: List[str] = Field(default_factory=list, sa_column=Column(JSON, nullable=False))
-    credit_cards: List[str] = Field(default_factory=list, sa_column=Column(JSON, nullable=False))
+    # JSON-owe kolumny z listami wrażliwych danych
+    emails: List[str] = Field(
+        sa_column=Column(JSON, nullable=False),
+        default_factory=list
+    )
+    pesel_numbers: List[str] = Field(
+        sa_column=Column(JSON, nullable=False),
+        default_factory=list
+    )
+    credit_cards: List[str] = Field(
+        sa_column=Column(JSON, nullable=False),
+        default_factory=list
+    )
 
-    # Predykcje ML jako słownik JSON (opcjonalne)
-    ml_predictions: Optional[Dict[str, Any]] = Field(default=None, sa_column=Column(JSON, nullable=True))
+    # predykcje ML jako słownik (opcjonalnie)
+    ml_predictions: Optional[Dict[str, Any]] = Field(
+        sa_column=Column(JSON, nullable=True),
+        default=None
+    )
 
-    # Podsumowanie analizy (tekst generowany przez AI)
+    # tekstowe podsumowanie wygenerowane przez AI
     summary: Optional[str] = Field(default=None)
 
-    # Relacja do użytkownika
+    # relacja do właściciela wyniku
     user: Optional[User] = Relationship(back_populates="results")
