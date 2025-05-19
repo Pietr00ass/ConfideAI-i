@@ -4,7 +4,7 @@ from PIL import Image
 import io
 import os
 from fastapi import (
-    FastAPI, Request, UploadFile, File, Form, HTTPException, Depends, Response
+    FastAPI, Request, UploadFile, File, Form, HTTPException, Depends, Response, status
 )
 from fastapi.responses import (
     HTMLResponse, RedirectResponse, JSONResponse
@@ -35,10 +35,23 @@ from sqlmodel import Session, select, SQLModel, create_engine, func
 from datetime import date, timedelta
 from fastapi import Depends
 from fastapi.responses import RedirectResponse
+from fastapi.exception_handlers import http_exception_handler as fastapi_http_exception_handler
+from urllib.parse import quote
 
 
 
 app = FastAPI(debug=True)
+
+@app.exception_handler(HTTPException)
+async def custom_http_exception_handler(request: Request, exc: HTTPException):
+    # przechwytujemy tylko 401 Unauthorized
+    if exc.status_code == status.HTTP_401_UNAUTHORIZED:
+        # tekst błędu (Musisz być zalogowany lub inny, jeśli podany)
+        msg = exc.detail if isinstance(exc.detail, str) else "Musisz być zalogowany"
+        redirect_url = f"/auth/login?error={quote(msg)}"
+        return RedirectResponse(url=redirect_url, status_code=302)
+    # pozostałe wyjątki obsłuż domyślnie
+    return await fastapi_http_exception_handler(request, exc)
 
 # --- Sessions & DB ---
 app.add_middleware(
