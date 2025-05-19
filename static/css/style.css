@@ -566,9 +566,10 @@ height: 1rem;
 
 /* wyrównanie stopki linków pod panelem */
 .login-footer {
-  width: 100%;
-  margin-top: 1.5rem;
-  text-align: center;
+  /* jeżeli nadal masz jakieś inne nadpisania: */
+  display: flex !important;
+  flex-direction: column;
+  align-items: center !important;
 }
 .login-footer p {
   margin: 0.5rem 0;
