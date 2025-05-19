@@ -3,6 +3,10 @@ from passlib.context import CryptContext
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.backends import default_backend
 import spacy
+import openai
+import os
+
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
 def ocr_image(image_path):
     img = cv2.imread(image_path)
@@ -59,6 +63,25 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 def hash_password(password: str) -> str:
     """Zwraca zhashowane hasło."""
     return pwd_context.hash(password)
+
+def summarize_analysis(emails: list[str], pesels: list[str], cards: list[str], ml: str) -> str:
+    """
+    Wysyła prompt do OpenAI i zwraca krótkie podsumowanie.
+    """
+    prompt = (
+        "Podsumuj w trzech zdaniach wyniki analizy dokumentu:\n"
+        f"- E-maile: {emails or 'Brak'}\n"
+        f"- PESEL: {pesels or 'Brak'}\n"
+        f"- Karty płatnicze: {cards or 'Brak'}\n"
+        f"- Inne predykcje ML: {ml or 'Brak'}\n\n"
+        "Podsumowanie:"
+    )
+    resp = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=[{"role":"user","content":prompt}],
+        temperature=0.7,
+    )
+    return resp.choices[0].message.content.strip()
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     """Sprawdza zgodność hasła jawnego z hash’em."""
