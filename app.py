@@ -291,16 +291,18 @@ def support_submit(
         {"request": request, "success": "Dziękujemy za zgłoszenie."}
     )
 
-# helper do 2FA
+ # --- helper do 2FA ---
+
 def verify_totp(user: User, code: str) -> bool:
     """
-    Weryfikuje kod TOTP z tolerancją ±1 okres (30s).
-
-    valid_window=1 pozwala zaakceptować kod z poprzedniego,
-    bieżącego lub następnego 30-sekundowego okienka.
+    Weryfikuje kod 2FA z tolerancją ±1 okienka (czyli ±30s).
+    Obcina białe znaki i akceptuje kod z poprzedniego, 
+    bieżącego lub następnego wygenerowanego okienka.
     """
     totp = pyotp.TOTP(user.two_factor_secret)
+    # strip() – usuwamy przypadkowe spacje, valid_window=1 – ±1 okres
     return totp.verify(code.strip(), valid_window=1)
+
 
 # 1) Strona logowania (GET)
 @app.get("/auth/login", response_class=HTMLResponse)
